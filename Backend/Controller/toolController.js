@@ -285,3 +285,4 @@ export const suggestions = async (req, res) => {
     });
   }
 };
+

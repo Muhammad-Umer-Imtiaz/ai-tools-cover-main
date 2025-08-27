@@ -3,6 +3,7 @@ export const NAV_LINKS = [
   // { href: "/category", key: "ai_categories", label: "Categories" },
   { href: '/ai-agents', key: 'ai_agents', label: 'AI Agents' },
   { href: '/ai-tools', key: 'ai_tools', label: 'AI Tools' },
+  { href: '/blogs', key: 'blogs', label: "Blogs" },
   { href: '/gpts', key: 'gpts ', label: 'GPTs ' },
   { href: '/prompts', key: 'prompts', label: 'Prompts' },
   { href: '/top-picks', key: 'top_picks', label: 'Top Picks' },
@@ -5618,63 +5619,63 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
     ],
   },
   {
-  id: "image-tools",
-  title: "AI Image Tools",
-  image: "/category_asset/image-tool.PNG",
-  description: "AI image tools are applications powered by machine learning and deep learning that assist with generating, modifying, or enhancing images using advanced technologies like GANs and Stable Diffusion.",
-  features: [
-    "Design generators",
-    "Image generators", 
-    "Image editing",
-    "Text to image"
-  ],
-  color: "text-indigo-600",
-  detailedDescription: "Want to turn words into art, enhance pictures automatically, or design visuals at scale? AI image tools are transforming how creators, marketers, designers, and developers work with visual media. With just a few clicks or a simple text prompt, you can now generate high-quality images, remove backgrounds, edit styles, upscale low-resolution images, and even create illustrations from scratch. AI Tools Cover brings you the most powerful, up-to-date AI tools for image generation, enhancement, and editing—all in one place.",
-  keyFeatures: [
-    "Text-to-Image Generation (from simple or complex prompts)",
-    "Image-to-Image Translation (turn sketches into colored art)",
-    "AI-based Style Transfer (Picasso-style, anime, oil painting, etc.)",
-    "Image Upscaling and Restoration (Super resolution)",
-    "Background removal or inpainting",
-    "Face swap, morphing, or enhancement",
-    "Avatar and logo generation",
-    "Integration with design tools like Canva, Photoshop, Figma"
-  ],
-  targetUsers: [
-    "Designers & digital artists creating visuals from scratch",
-    "Marketers generating ad creatives or social visuals",
-    "Bloggers & content creators producing thumbnails and graphics",
-    "E-commerce sellers enhancing product images",
-    "Educators and presenters looking for unique visual material",
-    "Developers & game designers creating environments and assets"
-  ],
-  useCases: [
-    "Generate images from text prompts (Text-to-Image)",
-    "Stylize or modify images (filters, art styles, backgrounds)",
-    "Automatically enhance, upscale, or restore low-res photos",
-    "Remove image backgrounds or unwanted elements",
-    "Create avatars, logos, and digital portraits from selfies",
-    "Convert sketches into digital illustrations or 3D renders"
-  ],
-  selectionCriteria: [
-    "Does it support your use case—creative, product, avatar, or art?",
-    "Is prompt input flexible (simple or structured)?",
-    "Are style & resolution customizable?",
-    "Is there a free version or pricing per generation?",
-    "Can you upload and edit existing images?"
-  ],
-  metaTitle: "AI Image Tools You Shouldn't Miss in 2025 – Generate, Edit & Create Visually",
-  metaDescription: "Explore top AI image tools in 2025 to generate, edit, and enhance images with ease. From text-to-image generators to photo editors, discover tools that turn prompts into professional visuals—only on AI Tools Cover.",
-  focusKeywords: [
-    "AI image tools",
-    "text to image",
-    "AI image generators",
-    "AI photo editors",
-    "image enhancement AI",
-    "image creation tools",
-    "image editing with AI",
-    "generative AI art"
-  ],
+    id: "image-tools",
+    title: "AI Image Tools",
+    image: "/category_asset/image-tool.PNG",
+    description: "AI image tools are applications powered by machine learning and deep learning that assist with generating, modifying, or enhancing images using advanced technologies like GANs and Stable Diffusion.",
+    features: [
+      "Design generators",
+      "Image generators",
+      "Image editing",
+      "Text to image"
+    ],
+    color: "text-indigo-600",
+    detailedDescription: "Want to turn words into art, enhance pictures automatically, or design visuals at scale? AI image tools are transforming how creators, marketers, designers, and developers work with visual media. With just a few clicks or a simple text prompt, you can now generate high-quality images, remove backgrounds, edit styles, upscale low-resolution images, and even create illustrations from scratch. AI Tools Cover brings you the most powerful, up-to-date AI tools for image generation, enhancement, and editing—all in one place.",
+    keyFeatures: [
+      "Text-to-Image Generation (from simple or complex prompts)",
+      "Image-to-Image Translation (turn sketches into colored art)",
+      "AI-based Style Transfer (Picasso-style, anime, oil painting, etc.)",
+      "Image Upscaling and Restoration (Super resolution)",
+      "Background removal or inpainting",
+      "Face swap, morphing, or enhancement",
+      "Avatar and logo generation",
+      "Integration with design tools like Canva, Photoshop, Figma"
+    ],
+    targetUsers: [
+      "Designers & digital artists creating visuals from scratch",
+      "Marketers generating ad creatives or social visuals",
+      "Bloggers & content creators producing thumbnails and graphics",
+      "E-commerce sellers enhancing product images",
+      "Educators and presenters looking for unique visual material",
+      "Developers & game designers creating environments and assets"
+    ],
+    useCases: [
+      "Generate images from text prompts (Text-to-Image)",
+      "Stylize or modify images (filters, art styles, backgrounds)",
+      "Automatically enhance, upscale, or restore low-res photos",
+      "Remove image backgrounds or unwanted elements",
+      "Create avatars, logos, and digital portraits from selfies",
+      "Convert sketches into digital illustrations or 3D renders"
+    ],
+    selectionCriteria: [
+      "Does it support your use case—creative, product, avatar, or art?",
+      "Is prompt input flexible (simple or structured)?",
+      "Are style & resolution customizable?",
+      "Is there a free version or pricing per generation?",
+      "Can you upload and edit existing images?"
+    ],
+    metaTitle: "AI Image Tools You Shouldn't Miss in 2025 – Generate, Edit & Create Visually",
+    metaDescription: "Explore top AI image tools in 2025 to generate, edit, and enhance images with ease. From text-to-image generators to photo editors, discover tools that turn prompts into professional visuals—only on AI Tools Cover.",
+    focusKeywords: [
+      "AI image tools",
+      "text to image",
+      "AI image generators",
+      "AI photo editors",
+      "image enhancement AI",
+      "image creation tools",
+      "image editing with AI",
+      "generative AI art"
+    ],
   },
   {
     id: 'automation-tools',
