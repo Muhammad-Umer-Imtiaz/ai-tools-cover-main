@@ -1,8 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   FiExternalLink,
   FiHeart,
@@ -74,13 +74,39 @@ interface SimilarToolsResponse {
   results: SimilarTool[];
 }
 
+interface Product {
+  _id?: number | string;
+  id?: string | number;
+  name: string;
+  image?: string;
+  thumbnail?: string;
+  logo?: string;
+  description: string;
+  tag: string;
+  tagIcon?: string;
+  link: string;
+  rating?: number;
+  reviewCount?: number;
+  isVerified?: boolean;
+  pricing?: 'free' | 'paid' | 'freemium';
+  views?: number;
+  clicks?: number;
+  overview?: string;
+  key_features?: string;
+  what_you_can_do_with?: string;
+  benefits?: string;
+  pricing_plans?: string;
+  tips_best_practices?: string;
+  final_take?: string;
+}
+
 interface ToolDetailClientProps {
   slug: string;
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
 function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [similarTools, setSimilarTools] = useState<SimilarTool[]>([]);
@@ -95,7 +121,6 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
     userName: '',
   });
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [showAllReviews, setShowAllReviews] = useState(false);
   const [copiedEmbed, setCopiedEmbed] = useState(false);
 
   // Initialize dummy reviews
@@ -140,8 +165,8 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
       }
     }, []);
 
-    const addToFavorites = (tool: any) => {
-      const toolId = tool._id || tool.id;
+    const addToFavorites = (tool: Product | SimilarTool) => {
+      const toolId = tool._id || (tool as Product).id;
       
       // Check if tool is already in favorites
       const isAlreadyFavorite = favorites.some((favTool) => favTool._id === toolId);
@@ -149,18 +174,21 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
         return; // Don't add if already exists
       }
 
-      const standardizedTool = {
-        _id: toolId, // Use _id consistently
-        name: tool.name || product.name,
-        image: tool.image || product.image || product.logo,
-        overview: tool.overview || '',
-        image_url: tool.image_url || product.image || product.logo,
-        thumbnail: tool.thumbnail || product.thumbnail,
-        thumbnail_url: tool.thumbnail_url || product.thumbnail,
-        description: tool.description || product.description,
-        category: tool.category || product.tag,
-        link: tool.link || product.link,
-        ...tool,
+      const standardizedTool: SimilarTool = {
+        _id: toolId as number,
+        name: tool.name,
+        link: tool.link,
+        image_url: (tool as Product).image || (tool as Product).logo || (tool as SimilarTool).image_url,
+        thumbnail_url: (tool as Product).thumbnail || (tool as SimilarTool).thumbnail_url,
+        description: tool.description,
+        tags: (tool as SimilarTool).tags || (tool as Product).tag,
+        created_at: (tool as SimilarTool).created_at || new Date().toISOString(),
+        is_approved: (tool as SimilarTool).is_approved ?? true,
+        click_count: (tool as SimilarTool).click_count || (tool as Product).clicks || 0,
+        views: (tool as SimilarTool).views || (tool as Product).views || 0,
+        developer: (tool as SimilarTool).developer || null,
+        category: (tool as SimilarTool).category || (tool as Product).tag,
+        submitted_by: (tool as SimilarTool).submitted_by || null,
       };
 
       const updatedFavorites = [...favorites, standardizedTool];
@@ -209,10 +237,10 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
       return favorites.some((tool) => tool._id === toolId);
     };
 
-    const toggleFavorite = (tool: any) => {
-      const toolId = tool._id || tool.id;
-      if (isFavorite(toolId)) {
-        removeFromFavorites(toolId);
+    const toggleFavorite = (tool: Product | SimilarTool) => {
+      const toolId = tool._id || (tool as Product).id;
+      if (isFavorite(toolId as number)) {
+        removeFromFavorites(toolId as number);
       } else {
         addToFavorites(tool);
       }
@@ -259,7 +287,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
     if (typeof window !== 'undefined') {
       try {
         const productData = {
-          _id: product._id.toString(), // Use _id
+          _id: product._id.toString(),
           id: product._id.toString(),
           name: product.name,
           image: product.image_url,
@@ -291,14 +319,13 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
       const isNumericId = /^\d+$/.test(slug);
 
       if (isNumericId) {
-        // Fixed: Match slug against item.id.toString() instead of item.name
         const featuredProduct = featuredProducts.find(
           (item) => item.id.toString() === slug
         );
         if (featuredProduct) {
-          const enhancedProduct = {
+          const enhancedProduct: Product = {
             ...featuredProduct,
-            _id: featuredProduct.id, // Add _id
+            _id: featuredProduct.id,
             rating: 4.5 + Math.random() * 0.5,
             reviewCount: Math.floor(Math.random() * 500) + 50,
             isVerified: true,
@@ -313,8 +340,8 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
       }
 
       if (searchParams.name && searchParams.description) {
-        const productFromParams = {
-          _id: parseInt(slug) || Date.now(), // Add _id
+        const productFromParams: Product = {
+          _id: parseInt(slug) || Date.now(),
           id: slug,
           name: searchParams.name as string,
           image:
@@ -357,11 +384,10 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
             const data = JSON.parse(sessionStorage.getItem(key) || '{}');
             const productSlug = createSlug(data.name);
 
-            // Fixed: Use strict equality (===) instead of loose equality (==)
             if (productSlug === slug) {
-              const enhancedData = {
+              const enhancedData: Product = {
                 ...data,
-                _id: parseInt(data._id || data.id), // Ensure _id exists
+                _id: parseInt(data._id || data.id),
                 id: parseInt(data.id),
                 isVerified: true,
                 pricing: data.pricing || 'freemium',
@@ -565,10 +591,12 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
               {/* Left Content */}
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <img
+                  <Image
                     src={product.logo}
                     alt={product.name}
-                    className="w-16 h-16 rounded-2xl shadow-lg object-cover"
+                    width={64}
+                    height={64}
+                    className="rounded-2xl shadow-lg object-cover"
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -678,9 +706,11 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                   className="relative rounded-3xl overflow-hidden shadow-2xl cursor-pointer group"
                   onClick={() => setIsModalOpen(true)}
                 >
-                  <img
+                  <Image
                     src={product.thumbnail || product.image}
                     alt={product.name}
+                    width={600}
+                    height={320}
                     className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -954,10 +984,12 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                       className="flex items-center gap-3 p-4 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 transition-all duration-300 group border border-gray-100 hover:border-[#7d42fb]/30 hover:shadow-md"
                     >
                       <div className="relative">
-                        <img
+                        <Image
                           src={tool.logo}
                           alt={tool.name}
-                          className="w-12 h-12 rounded-lg object-cover shadow-sm"
+                          width={48}
+                          height={48}
+                          className="rounded-lg object-cover shadow-sm"
                         />
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-[#7d42fb] to-[#9b59ff] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
@@ -1005,10 +1037,12 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-4 border border-white/20">
                   <div className="bg-white rounded-lg p-3 text-center">
                     <div className="flex items-center justify-center gap-2">
-                      <img
+                      <Image
                         src="/logo.png"
                         alt="AI Tools Cover"
-                        className="w-4 h-4 object-contain"
+                        width={16}
+                        height={16}
+                        className="object-contain"
                       />
                       <a
                         href="https://aitoolscover.com"
@@ -1060,7 +1094,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                       &lt;div style="max-width: 220px..."&gt;
                     </div>
                     <div className="ml-2 opacity-50">
-                      // Widget with logo and attribution
+                      {'// Widget with logo and attribution'}
                     </div>
                     <div className="opacity-70">&lt;/div&gt;</div>
                   </div>
@@ -1151,9 +1185,11 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                     />
                   </svg>
                 </button>
-                <img
+                <Image
                   src={product.thumbnail || product.image}
                   alt={product.name}
+                  width={1200}
+                  height={800}
                   className="object-contain max-h-[90vh] max-w-[90vw]"
                 />
               </div>
@@ -1263,10 +1299,12 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                     <div className="flex items-start justify-between mb-3 sm:mb-4 flex-shrink-0">
                       <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#7d42fb]/10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-                          <img
+                          <Image
                             src={tool.image_url}
                             alt={tool.name}
-                            className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
+                            width={32}
+                            height={32}
+                            className="object-contain"
                           />
                         </div>
                         <div className="flex-1 min-w-0">
