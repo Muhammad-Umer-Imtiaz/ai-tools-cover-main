@@ -114,7 +114,7 @@ const CookiePopup: React.FC = () => {
           <div className="p-4">
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
               We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. 
-              Choose which cookies you'd like to accept.
+              Choose which cookies you&apos;d like to accept.
             </p>
 
             {!showDetails ? (

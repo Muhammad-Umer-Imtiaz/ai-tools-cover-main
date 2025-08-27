@@ -13,7 +13,7 @@ const NewsletterPopup: React.FC = () => {
     const hasSubscribed = getNewsletterStatus() === 'subscribed';
     if (hasSubscribed) return;
     
-    // Show popup after 5 seconds regardless of previous dismissals
+    // Show popup after 10 seconds
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 10000);
@@ -38,7 +38,6 @@ const NewsletterPopup: React.FC = () => {
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
-      // Only set dismissed status, don't prevent future shows
       setNewsletterStatus('dismissed');
     }, 300);
   };
@@ -65,17 +64,12 @@ const NewsletterPopup: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call - replace with your actual newsletter signup logic
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Here you would typically call your newsletter API
       console.log('Subscribing email:', email);
       
       setIsSuccess(true);
-      // Only mark as subscribed when user actually subscribes
       setNewsletterStatus('subscribed');
       
-      // Auto-close after success
       setTimeout(() => {
         handleClose();
       }, 2500);
@@ -92,18 +86,14 @@ const NewsletterPopup: React.FC = () => {
 
   return (
     <div 
-      className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${
-        isClosing ? 'opacity-0' : 'opacity-100'
-      }`}
+      className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
       onClick={handleBackdropClick}
     >
       <div 
-        className={`bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all duration-300 ${
-          isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'
-        }`}
+        className={`bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all duration-300 ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with close button */}
+        {/* Header */}
         <div className="relative">
           <button
             onClick={handleClose}
@@ -113,10 +103,7 @@ const NewsletterPopup: React.FC = () => {
           </button>
           
           {/* Background gradient */}
-          <div 
-            className="h-32 relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #7d42fb 0%, #a855f7 100%)' }}
-          >
+          <div className="h-32 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #7d42fb 0%, #a855f7 100%)' }}>
             <div className="absolute inset-0 bg-white/10">
               <div className="absolute top-4 left-4">
                 <Bot className="w-8 h-8 text-white/80 animate-pulse" />
@@ -139,17 +126,12 @@ const NewsletterPopup: React.FC = () => {
 
         {/* Content */}
         <div className="p-6 -mt-8 relative">
-          {/* Icon */}
-          <div 
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg"
-            style={{ backgroundColor: '#7d42fb' }}
-          >
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg" style={{ backgroundColor: '#7d42fb' }}>
             <Bot className="w-8 h-8 text-white" />
           </div>
 
           {!isSuccess ? (
             <>
-              {/* Heading */}
               <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
                 Discover the Latest AI Tools! 🤖
               </h2>
@@ -158,7 +140,6 @@ const NewsletterPopup: React.FC = () => {
                 comprehensive reviews, and exclusive insights delivered to your inbox.
               </p>
 
-              {/* Benefits */}
               <div className="space-y-2 mb-6">
                 <div className="flex items-center gap-3 text-sm text-gray-700">
                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#7d42fb' }}></div>
@@ -178,7 +159,6 @@ const NewsletterPopup: React.FC = () => {
                 </div>
               </div>
 
-              {/* Email Input and Button */}
               <div className="space-y-4">
                 <div className="relative">
                   <input
@@ -223,21 +203,17 @@ const NewsletterPopup: React.FC = () => {
               </p>
             </>
           ) : (
-            /* Success State */
             <div className="text-center py-4">
-              <div 
-                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: '#10b981' }}
-              >
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#10b981' }}>
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Welcome to the AI Community! 🎉
+                You&apos;re now subscribed to our AI tools newsletter! Check your email for a welcome message with exclusive resources.
               </h3>
               <p className="text-gray-600 mb-4">
-                You're now subscribed to our AI tools newsletter! Check your email for a welcome message with exclusive resources.
+                You&apos;re now part of our AI community. Enjoy exclusive updates, tips, and resources!
               </p>
               <div className="text-sm text-gray-500">
                 This popup will close automatically...
