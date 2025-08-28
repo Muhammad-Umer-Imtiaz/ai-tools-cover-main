@@ -34,21 +34,24 @@ const FeaturePage = () => {
   const [sortBy, setSortBy] = useState('popularity');
   const [filterBy, setFilterBy] = useState('all');
 
-  useEffect(() => {
-    const featureSlug = pathname.split('/').pop();
-    
-    // Find the feature data from AI_TOOLS_FEATURES
-    const matchedFeature = AI_TOOLS_FEATURES.find(
-      feature => feature.id === featureSlug
-    );
-    
-    if (matchedFeature) {
-      setFeatureData(matchedFeature);
-      setTools(generateDummyTools(matchedFeature.title));
-    }
-    
-    setLoading(false);
-  }, [pathname]);
+ useEffect(() => {
+  if (!pathname) return; // Guard against null
+
+  const featureSlug = pathname.split('/').pop(); // Safe now
+
+  // Find the feature data from AI_TOOLS_FEATURES
+  const matchedFeature = AI_TOOLS_FEATURES.find(
+    feature => feature.id === featureSlug
+  );
+
+  if (matchedFeature) {
+    setFeatureData(matchedFeature);
+    setTools(generateDummyTools(matchedFeature.title));
+  }
+
+  setLoading(false);
+}, [pathname]);
+
 
   const generateDummyTools = (featureTitle: string): AITool[] => {
     const toolNames = [

@@ -212,7 +212,7 @@ const HeartButton: React.FC<HeartButtonProps> = ({
 
 const SearchContent = () => {
   const searchParams = useSearchParams();
- const query = searchParams.get('q') || '';
+const query = searchParams?.get('q') ?? '';
    const [searchData, setSearchData] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+const pathname = usePathname() ?? '';
+  
 
   const isCategoryPage = pathname.endsWith("/category"); 
   const isPrivacyPolicyPage = pathname.startsWith("/privacy-policy"); 
