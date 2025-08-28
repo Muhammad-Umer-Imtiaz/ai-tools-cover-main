@@ -55,6 +55,7 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    console.log(req.body);
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -62,6 +63,7 @@ export const login = async (req, res) => {
     }
 
     const findUser = await User.findOne({ username });
+    console.log(findUser);
     if (!findUser) {
       return res.status(400).json({ message: "User not found" });
     }
