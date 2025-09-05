@@ -302,9 +302,11 @@ const AllProduct: React.FC = () => {
   const fetchInitialProducts = async () => {
     try {
       setLoading(true);
+      console.log('Backend URL ',process.env.NEXT_PUBLIC_BACKEND_URL)
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/pagination?limit=${PRODUCTS_PER_LOAD}&offset=0`
       );
+      console.log(response);
       console.log('Fetching initial products...');
 
       if (!response.ok) {

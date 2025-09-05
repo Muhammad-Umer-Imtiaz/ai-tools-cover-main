@@ -25,18 +25,26 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
   readOnly: readOnlyFromProps,
 }) => {
   const { label } = field
-  const fieldPath = path || field.name
+  const fieldPath = path || field?.name
 
-  // ✅ Hooks must always be called
-  const fieldHook = useField<string>({ path: fieldPath })
-  const { value, setValue } = fieldHook
+  // ✅ Ensure fieldPath exists BEFORE using useField
+  if (!fieldPath) {
+    console.error('SlugComponent: No field path provided')
+    return <div>Error: No field path provided</div>
+  }
+
+  // ✅ Correct usage of useField
+  const { value, setValue } = useField<string>({
+    path: fieldPath,
+  })
 
   const { dispatchFields, getDataByPath } = useForm()
+
   const isLocked = useFormFields(([fields]) => {
     return fields[checkboxFieldPathFromProps]?.value as boolean
   })
 
-  // ✅ Event handlers with hooks inside
+  // ✅ Generate slug from target field
   const handleGenerate = useCallback(
     (e: React.MouseEvent<Element>) => {
       e.preventDefault()
@@ -57,6 +65,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
     [setValue, value, fieldToUse, getDataByPath],
   )
 
+  // ✅ Lock/unlock field
   const handleLock = useCallback(
     (e: React.MouseEvent<Element>) => {
       e.preventDefault()
@@ -70,12 +79,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
     [isLocked, checkboxFieldPathFromProps, dispatchFields],
   )
 
-  // ✅ Render error state AFTER hooks
-  if (!fieldPath) {
-    console.error('SlugComponent: No field path provided')
-    return <div>Error: No field path provided</div>
-  }
-
+  // ✅ Render UI
   return (
     <div className="field-type slug-field-component">
       <div className="label-wrapper">
