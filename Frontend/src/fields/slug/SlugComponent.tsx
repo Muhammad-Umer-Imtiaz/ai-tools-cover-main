@@ -33,21 +33,35 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
     return <div>Error: No field path provided</div>
   }
 
-  // ✅ Correct usage of useField
-  const { value, setValue } = useField<string>({
-    path: fieldPath,
-  })
+  // ✅ Fixed usage of useField with proper error handling
+  let fieldHook
+  try {
+    fieldHook = useField<string>({
+      path: fieldPath,
+    })
+  } catch (error) {
+    console.error('useField hook error:', error)
+    return <div>Error: Failed to initialize field hook</div>
+  }
+
+  // ✅ Destructure with fallback values
+  const { value = '', setValue } = fieldHook || {}
 
   const { dispatchFields, getDataByPath } = useForm()
 
   const isLocked = useFormFields(([fields]) => {
-    return fields[checkboxFieldPathFromProps]?.value as boolean
+    return Boolean(fields[checkboxFieldPathFromProps]?.value)
   })
 
   // ✅ Generate slug from target field
   const handleGenerate = useCallback(
     (e: React.MouseEvent<Element>) => {
       e.preventDefault()
+
+      if (!setValue) {
+        console.error('setValue function not available')
+        return
+      }
 
       const targetFieldValue = getDataByPath(fieldToUse) as string
 
@@ -79,7 +93,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
     [isLocked, checkboxFieldPathFromProps, dispatchFields],
   )
 
-  // ✅ Render UI
+  // ✅ Render UI with additional safety checks
   return (
     <div className="field-type slug-field-component">
       <div className="label-wrapper">

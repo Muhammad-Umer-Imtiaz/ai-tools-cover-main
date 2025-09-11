@@ -37,7 +37,7 @@ const Page = () => {
             return;
           }
         }
-
+        console.log("api Calling")
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}api/posts/${id}`,
           { cache: 'no-store' }
