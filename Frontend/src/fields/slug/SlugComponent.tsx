@@ -1,14 +1,9 @@
 'use client'
 import React, { useCallback } from 'react'
 import { TextFieldClientProps } from 'payload'
-import {
-  useField,
-  Button,
-  TextInput,
-  FieldLabel,
-  useFormFields,
-  useForm,
-} from '@payloadcms/ui'
+
+import { useField, Button, TextInput, FieldLabel, useFormFields, useForm } from '@payloadcms/ui'
+
 import { formatSlug } from './formatSlug'
 import './index.scss'
 
@@ -25,6 +20,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
   readOnly: readOnlyFromProps,
 }) => {
   const { label } = field
+<<<<<<< HEAD
   const fieldPath = path || field?.name
 
   // ✅ Ensure fieldPath exists BEFORE using useField
@@ -46,14 +42,28 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
 
   // ✅ Destructure with fallback values
   const { value = '', setValue } = fieldHook || {}
+=======
+
+  const checkboxFieldPath = path?.includes('.')
+    ? `${path}.${checkboxFieldPathFromProps}`
+    : checkboxFieldPathFromProps
+
+  const { value, setValue } = useField<string>({ path: path || field.name })
+>>>>>>> c0fc529 (Fix issue in Admin Panel Blogs Section)
 
   const { dispatchFields, getDataByPath } = useForm()
 
   const isLocked = useFormFields(([fields]) => {
+<<<<<<< HEAD
     return Boolean(fields[checkboxFieldPathFromProps]?.value)
   })
 
   // ✅ Generate slug from target field
+=======
+    return fields[checkboxFieldPath]?.value as string
+  })
+
+>>>>>>> c0fc529 (Fix issue in Admin Panel Blogs Section)
   const handleGenerate = useCallback(
     (e: React.MouseEvent<Element>) => {
       e.preventDefault()
@@ -67,13 +77,10 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
 
       if (targetFieldValue) {
         const formattedSlug = formatSlug(targetFieldValue)
-        if (value !== formattedSlug) {
-          setValue(formattedSlug)
-        }
+
+        if (value !== formattedSlug) setValue(formattedSlug)
       } else {
-        if (value !== '') {
-          setValue('')
-        }
+        if (value !== '') setValue('')
       }
     },
     [setValue, value, fieldToUse, getDataByPath],
@@ -86,39 +93,34 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
 
       dispatchFields({
         type: 'UPDATE',
-        path: checkboxFieldPathFromProps,
+        path: checkboxFieldPath,
         value: !isLocked,
       })
     },
-    [isLocked, checkboxFieldPathFromProps, dispatchFields],
+    [isLocked, checkboxFieldPath, dispatchFields],
   )
 
+<<<<<<< HEAD
   // ✅ Render UI with additional safety checks
+=======
+>>>>>>> c0fc529 (Fix issue in Admin Panel Blogs Section)
   return (
     <div className="field-type slug-field-component">
       <div className="label-wrapper">
-        <FieldLabel htmlFor={`field-${fieldPath}`} label={label} />
+        <FieldLabel htmlFor={`field-${path}`} label={label} />
         {!isLocked && (
-          <Button
-            className="lock-button"
-            buttonStyle="none"
-            onClick={handleGenerate}
-          >
+          <Button className="lock-button" buttonStyle="none" onClick={handleGenerate}>
             Generate
           </Button>
         )}
-        <Button
-          className="lock-button"
-          buttonStyle="none"
-          onClick={handleLock}
-        >
+        <Button className="lock-button" buttonStyle="none" onClick={handleLock}>
           {isLocked ? 'Unlock' : 'Lock'}
         </Button>
       </div>
       <TextInput
-        value={value || ''}
+        value={value}
         onChange={setValue}
-        path={fieldPath}
+        path={path || field.name}
         readOnly={Boolean(readOnlyFromProps || isLocked)}
       />
     </div>
