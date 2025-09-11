@@ -8,6 +8,7 @@ import {
   addTool,
   categoryPagination,
   findToolByUser,
+  getAllTools,
   pagination,
   Search,
   submitTool,
@@ -47,6 +48,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post("/add", upload.single("file"), addTool);
+router.get("/get-all-tools", getAllTools);
 router.post("/addtool", isAuthenticated, AddTool);
 router.post("/submit/:id", isAuthenticated, submitTool);
 router.get("/tool-by-user", isAuthenticated, findToolByUser);

@@ -153,6 +153,23 @@ export const findToolByUser = async (req, res) => {
   }
 };
 
+export const getAllTools = async (req, res) => {
+  try {
+    const tool = await Tool.find();
+    if (!tool)
+      return res
+        .status(401)
+        .json({ success: false, message: "Tools not Found" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Get all Tools Successfully", tool });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server issue" });
+  }
+};
+
 export const pagination = async (req, res) => {
   try {
     const page = parseInt(req.query.offset) || 1;
@@ -285,4 +302,3 @@ export const suggestions = async (req, res) => {
     });
   }
 };
-

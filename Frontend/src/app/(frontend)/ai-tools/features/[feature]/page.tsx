@@ -1,5 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -34,24 +32,23 @@ const FeaturePage = () => {
   const [sortBy, setSortBy] = useState('popularity');
   const [filterBy, setFilterBy] = useState('all');
 
- useEffect(() => {
-  if (!pathname) return; // Guard against null
-
-  const featureSlug = pathname.split('/').pop(); // Safe now
-
-  // Find the feature data from AI_TOOLS_FEATURES
-  const matchedFeature = AI_TOOLS_FEATURES.find(
-    feature => feature.id === featureSlug
-  );
-
-  if (matchedFeature) {
-    setFeatureData(matchedFeature);
-    setTools(generateDummyTools(matchedFeature.title));
-  }
-
-  setLoading(false);
-}, [pathname]);
-
+  useEffect(() => {
+    const featureSlug = pathname.split('/').pop();
+    console.log("Feature Slug", featureSlug)
+    
+    // Find the feature data from AI_TOOLS_FEATURES
+    const matchedFeature = AI_TOOLS_FEATURES.find(
+      feature => feature.id === featureSlug
+    );
+    console.log("Matched Feature ",matchedFeature)
+    
+    if (matchedFeature) {
+      setFeatureData(matchedFeature);
+      setTools(generateDummyTools(matchedFeature.title));
+    }
+    
+    setLoading(false);
+  }, [pathname]);
 
   const generateDummyTools = (featureTitle: string): AITool[] => {
     const toolNames = [

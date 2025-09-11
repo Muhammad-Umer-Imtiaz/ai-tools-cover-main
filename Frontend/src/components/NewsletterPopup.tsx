@@ -13,6 +13,10 @@ const NewsletterPopup: React.FC = () => {
     const hasSubscribed = getNewsletterStatus() === 'subscribed';
     if (hasSubscribed) return;
     
+    // Check if popup was dismissed in the last 24 hours
+    const isDismissed = isPopupDismissedRecently();
+    if (isDismissed) return;
+    
     // Show popup after 10 seconds
     const timer = setTimeout(() => {
       setIsVisible(true);
@@ -22,15 +26,36 @@ const NewsletterPopup: React.FC = () => {
   }, []);
 
   const getNewsletterStatus = () => {
-    if (typeof localStorage !== 'undefined') {
+    if (typeof window !== 'undefined' && window.localStorage) {
       return localStorage.getItem('newsletter_status');
     }
     return null;
   };
 
   const setNewsletterStatus = (status: string) => {
-    if (typeof localStorage !== 'undefined') {
+    if (typeof window !== 'undefined' && window.localStorage) {
       localStorage.setItem('newsletter_status', status);
+    }
+  };
+
+  const isPopupDismissedRecently = () => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const dismissedTime = localStorage.getItem('newsletter_dismissed_time');
+      if (dismissedTime) {
+        const dismissedTimestamp = parseInt(dismissedTime);
+        const currentTime = Date.now();
+        const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        
+        // Check if less than 24 hours have passed
+        return (currentTime - dismissedTimestamp) < twentyFourHours;
+      }
+    }
+    return false;
+  };
+
+  const setDismissedTime = () => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem('newsletter_dismissed_time', Date.now().toString());
     }
   };
 
@@ -39,6 +64,7 @@ const NewsletterPopup: React.FC = () => {
     setTimeout(() => {
       setIsVisible(false);
       setNewsletterStatus('dismissed');
+      setDismissedTime(); // Set the dismissed timestamp
     }, 300);
   };
 

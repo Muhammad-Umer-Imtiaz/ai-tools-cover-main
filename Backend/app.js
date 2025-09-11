@@ -26,8 +26,10 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 // Routes
 app.use("/api/user", userRoute);
 app.use("/api/posts", postRoutes); // routes that read raw "posts" collection
-
 app.use("/api/tool", toolRoutes);
+app.get("/", (req, res) => {
+  res.send("Backend Running Successfull");
+});
 
 // Connect DB
 dbConnection();
