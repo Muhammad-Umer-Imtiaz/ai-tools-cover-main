@@ -2,37 +2,31 @@ import { NextResponse } from 'next/server';
 import { categories } from '@/constants';
 
 export async function GET() {
+  // ✅ Apna base URL set karo
+  // Production me NEXT_PUBLIC_BASE_URL use hoga, warna localhost
   const baseUrl = 'https://aitoolscover.com';
+
+  // ✅ Sitemap ke liye current date
   const currentDate = new Date().toISOString();
 
-  // Helper function to create URL-friendly slugs
-  const createSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
+  // ✅ Tools ke naam ko URL-friendly slug me convert karne ka helper function
+  const createSlug = (name: string): string =>
+    name
+      .toLowerCase()                 // sab lowercase me
+      .replace(/[^a-z0-9]+/g, '-')   // non-alphanumeric ko `-` me badalna
+      .replace(/^-+|-+$/g, '');      // starting/ending `-` hata dena
 
-  // Helper function to create a clean slug (e.g., "Writing & Editing" -> "Writing-Editing")
+  // ✅ Categories ke liye clean slug function (e.g. "Writing & Editing" -> "writing-editing")
   const createCategorySlug = (label: string): string =>
     label
-      .replace(/&/g, '')                // Remove ampersand
-      .replace(/[^\w\s-]/g, '')         // Remove other special chars except hyphen
-      .replace(/\s+/g, '-')             // Replace spaces with hyphens
-      .replace(/-+/g, '-')              // Collapse multiple hyphens
-      .replace(/^-+|-+$/g, '')          // Trim leading/trailing hyphens
-      .toLowerCase();
+      .replace(/&/g, '')             // ampersand remove
+      .replace(/[^\w\s-]/g, '')      // special characters remove
+      .replace(/\s+/g, '-')          // spaces ko `-` me convert
+      .replace(/-+/g, '-')           // multiple `-` ko ek karna
+      .replace(/^-+|-+$/g, '')       // start/end hyphen remove
+      .toLowerCase();                // lowercase me convert
 
-  console.log(categories.map(
-    category => `<url>
-      <loc>${baseUrl}/category/${createCategorySlug(category.label)}</loc>
-      <lastmod>${currentDate}</lastmod>
-      <changefreq>daily</changefreq>
-      <priority>0.8</priority>
-    </url>`
-  ).join(''));
-
-  // Generate category URLs
+  // ✅ Categories se sitemap URLs generate karna
   const categoryUrls = categories.map(
     category => `<url>
       <loc>${baseUrl}/category/${createCategorySlug(category.label)}</loc>
@@ -42,47 +36,47 @@ export async function GET() {
     </url>`
   ).join('');
 
-  // Fetch tools for all categories and generate URLs
+  // ✅ Tools ke URLs yaha store honge
   let toolsUrls = '';
 
   try {
-    // Process categories sequentially to avoid overwhelming the API
-    for (const category of categories) {
-      // Extract first word of category for API
-      const categoryFirstWord = category.label.split(' ')[0].toLowerCase();
-      console.log(`Fetching tools for category: ${categoryFirstWord}`);
+    console.log("Fetching all tools for sitemap...");
 
-      const response = await fetch(
-        `/api/tools/category_without_limit/?category=${encodeURIComponent(categoryFirstWord)}`,
-        { next: { revalidate: 86400 } } // Revalidate once per day
-      );
+    // ✅ Backend API se tools fetch karna
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/get-all-tools`);
 
-      if (!response.ok) {
-        console.error(`Failed to fetch tools for ${categoryFirstWord}: ${response.status}`);
-        continue;
-      }
+    if (!res.ok) {
+      // Agar API response fail ho jaye
+      console.error(`Failed to fetch tools: ${res.status}`);
+    } else {
+      const data = await res.json();
+      console.log(`Found ${data.total_results} tools`);
 
-      const data = await response.json();
-      console.log(`Found ${data.total_results} tools for ${categoryFirstWord}`);
+      // ✅ API se aaye tools ko sitemap URLs me convert karna
+      const Tools = (data.tool || data.results || []).map(
+        (tool: { name: string; createdAt?: string | number | Date }) => {
+          // Agar tool ke paas date nahi hai to current date use karna
+          const toolDate = tool.createdAt
+            ? new Date(tool.createdAt).toISOString()
+            : currentDate;
 
-      // Add each tool to sitemap
-      const categoryTools = data.results.map((tool: { name: string; created_at: string | number | Date; }) => {
-        const toolDate = tool.created_at ? new Date(tool.created_at).toISOString() : currentDate;
-        return `<url>
-          <loc>${baseUrl}/ai-tools/${createSlug(tool.name)}</loc>
-          <lastmod>${toolDate}</lastmod>
-          <changefreq>weekly</changefreq>
-          <priority>0.7</priority>
-        </url>`;
-      }).join('');
+          return `<url>
+            <loc>${baseUrl}/ai-tools/${createSlug(tool.name)}</loc>
+            <lastmod>${toolDate}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.7</priority>
+          </url>`;
+        }
+      ).join('');
 
-      toolsUrls += categoryTools;
+      toolsUrls += Tools;
     }
-  } catch (error) {
-    console.error('Error fetching tools for sitemap:', error);
+  } catch (error: any) {
+    // ✅ Agar API call hi fail ho jaye
+    console.error('Error fetching tools for sitemap:', error?.message || error);
   }
 
-  // Generate static pages URLs
+  // ✅ Static pages ke liye URLs
   const staticUrls = [
     { path: '', priority: '1.0', changefreq: 'weekly' },
     { path: '/category', priority: '0.7', changefreq: 'weekly' },
@@ -104,7 +98,7 @@ export async function GET() {
     <priority>${priority}</priority>
   </url>`).join('');
 
-  // Combine all URLs into sitemap
+  // ✅ Final Sitemap (static + category + tools sab combine ho gaye)
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     ${staticUrls}
@@ -112,9 +106,8 @@ export async function GET() {
     ${toolsUrls}
   </urlset>`;
 
+  // ✅ Response return karna with correct header
   return new NextResponse(sitemap, {
-    headers: {
-      'Content-Type': 'application/xml',
-    },
+    headers: { 'Content-Type': 'application/xml' },
   });
 }
