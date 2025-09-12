@@ -78,11 +78,11 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
 
       dispatchFields({
         type: 'UPDATE',
-        path: checkboxFieldPath,
+        path: checkboxFieldPathFromProps,
         value: !isLocked,
       })
     },
-    [isLocked, checkboxFieldPath, dispatchFields],
+    [isLocked, checkboxFieldPathFromProps, dispatchFields],
   )
 
   // ✅ Render UI with additional safety checks
