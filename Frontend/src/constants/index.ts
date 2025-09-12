@@ -5896,6 +5896,7 @@ export const featuredProducts = [
     link: 'https://submitaitools.org/',
     category: 'Productivity',
     click_count: 0,
+    overview:'hello',
     views: 0,
   },
   {
@@ -5909,6 +5910,8 @@ export const featuredProducts = [
     tagIcon: '/star.svg',
     link: 'https://www.heygen.com/',
     category: 'Productivity',
+        overview:'hello',
+
     views: 0,
     click_count: 0,
   },
@@ -5917,6 +5920,8 @@ export const featuredProducts = [
     name: 'Synthesia',
     logo: '/synthesia.png',
     image: '/featureproduct3.png',
+        overview:'hello',
+
     description:
       'Synthesia is an AI video communications platform that allows users to create professional-quality videos from text.',
     tag: 'Video',

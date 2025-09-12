@@ -1,50 +1,69 @@
-'use client';
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { FiExternalLink, FiHeart, FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp, FiUsers, FiTarget, FiZap, FiTrendingUp } from 'react-icons/fi';
-import { FaHeart, FaBrain, FaRobot, FaCalendarAlt, FaFileAlt, FaPuzzlePiece, FaChartBar } from 'react-icons/fa';
-import { AI_TOOLS_CATEGORIES, AI_TOOLS_FEATURES } from '@/constants';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
+import {
+  FiExternalLink,
+  FiHeart,
+  FiChevronLeft,
+  FiChevronRight,
+  FiChevronDown,
+  FiChevronUp,
+  FiUsers,
+  FiTarget,
+  FiZap,
+  FiTrendingUp,
+} from 'react-icons/fi'
+import {
+  FaHeart,
+  FaBrain,
+  FaRobot,
+  FaCalendarAlt,
+  FaFileAlt,
+  FaPuzzlePiece,
+  FaChartBar,
+} from 'react-icons/fa'
+import { AI_TOOLS_CATEGORIES } from '@/constants'
+import toast from 'react-hot-toast'
 
 interface Tool {
-  id: number;
-  name: string;
-  description: string;
-  image_url?: string;
-  thumbnail_url: string;
-  category: string;
-  click_count: number;
-  link?: string;
-  views?: string;
+  id: number
+  name: string
+  description: string
+  image_url?: string
+  thumbnail_url: string
+  category: string
+  click_count: number
+  link?: string
+  views?: string
 }
 
 const useFavorites = () => {
-  const [favorites, setFavorites] = useState<Tool[]>([]);
+  const [favorites, setFavorites] = useState<Tool[]>([])
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedFavorites = localStorage.getItem('favoriteTools');
+      const savedFavorites = localStorage.getItem('favoriteTools')
       if (savedFavorites) {
         try {
-          setFavorites(JSON.parse(savedFavorites));
+          setFavorites(JSON.parse(savedFavorites))
         } catch (error) {
-          console.error('Error parsing saved favorites:', error);
-          localStorage.removeItem('favoriteTools');
+          console.error('Error parsing saved favorites:', error)
+          localStorage.removeItem('favoriteTools')
         }
       }
     }
-  }, []);
+  }, [])
 
   const addToFavorites = (tool: any) => {
-    const updatedFavorites = [...favorites, tool];
-    setFavorites(updatedFavorites);
+    const updatedFavorites = [...favorites, tool]
+    setFavorites(updatedFavorites)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites));
+      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites))
     }
-    
+
     toast.success(`${tool.name || 'Tool'} added to favorites!`, {
       duration: 3000,
       position: 'top-right',
@@ -56,18 +75,18 @@ const useFavorites = () => {
         padding: '10px 15px',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
       },
-    });
-  };
+    })
+  }
 
   const removeFromFavorites = (toolId: number) => {
-    const toolToRemove = favorites.find(tool => tool.id === toolId);
-    
-    const updatedFavorites = favorites.filter(tool => tool.id !== toolId);
-    setFavorites(updatedFavorites);
+    const toolToRemove = favorites.find((tool) => tool.id === toolId)
+
+    const updatedFavorites = favorites.filter((tool) => tool.id !== toolId)
+    setFavorites(updatedFavorites)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites));
+      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites))
     }
-    
+
     toast.success(`${toolToRemove?.name || 'Tool'} removed from favorites!`, {
       duration: 3000,
       position: 'top-right',
@@ -79,102 +98,94 @@ const useFavorites = () => {
         padding: '10px 15px',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
       },
-    });
-  };
+    })
+  }
 
   const isFavorite = (toolId: number) => {
-    return favorites.some(tool => tool.id === toolId);
-  };
+    return favorites.some((tool) => tool.id === toolId)
+  }
 
-  const toggleFavorite = (tool: { id: number; }) => {
+  const toggleFavorite = (tool: { id: number }) => {
     if (isFavorite(tool.id)) {
-      removeFromFavorites(tool.id);
+      removeFromFavorites(tool.id)
     } else {
-      addToFavorites(tool);
+      addToFavorites(tool)
     }
-  };
+  }
 
   return {
     favorites,
     addToFavorites,
     removeFromFavorites,
     isFavorite,
-    toggleFavorite
-  };
-};
+    toggleFavorite,
+  }
+}
 
 // Heart Button Component
 interface HeartButtonProps {
-  tool: any;
-  isFavorite: boolean;
-  onToggle: (tool: any) => void;
+  tool: any
+  isFavorite: boolean
+  onToggle: (tool: any) => void
 }
 
 const HeartButton: React.FC<HeartButtonProps> = ({ tool, isFavorite, onToggle }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false)
 
-  const handleClick = (e: { preventDefault: () => void; stopPropagation: () => void; }) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    setIsAnimating(true);
-    onToggle(tool);
-    
-    setTimeout(() => setIsAnimating(false), 300);
-  };
+  const handleClick = (e: { preventDefault: () => void; stopPropagation: () => void }) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    setIsAnimating(true)
+    onToggle(tool)
+
+    setTimeout(() => setIsAnimating(false), 300)
+  }
 
   return (
     <button
       onClick={handleClick}
       className={`p-2 rounded-full transition-all duration-300 hover:scale-110 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md ${
         isAnimating ? 'animate-pulse' : ''
-      } ${
-        isFavorite 
-          ? 'text-red-500 hover:text-red-600' 
-          : 'text-gray-400 hover:text-red-500'
-      }`}
+      } ${isFavorite ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'}`}
       aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
     >
-      {isFavorite ? (
-        <FaHeart size={18} className="drop-shadow-sm" />
-      ) : (
-        <FiHeart size={18} />
-      )}
+      {isFavorite ? <FaHeart size={18} className="drop-shadow-sm" /> : <FiHeart size={18} />}
     </button>
-  );
-};
+  )
+}
 
 // Tools Slider Component
 interface ToolsSliderProps {
-  tools: Tool[];
-  featureName: string;
+  tools: Tool[]
+  featureName: string
 }
 
 const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const itemsPerPage = 3;
-  const totalPages = Math.ceil(tools.length / itemsPerPage);
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const { isFavorite, toggleFavorite } = useFavorites()
+  const itemsPerPage = 3
+  const totalPages = Math.ceil(tools.length / itemsPerPage)
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % totalPages);
-  };
+    setCurrentIndex((prev) => (prev + 1) % totalPages)
+  }
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
-  };
+    setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages)
+  }
 
   const getCurrentTools = () => {
-    const start = currentIndex * itemsPerPage;
-    return tools.slice(start, start + itemsPerPage);
-  };
+    const start = currentIndex * itemsPerPage
+    return tools.slice(start, start + itemsPerPage)
+  }
 
   const createToolSlug = (name: string): string => {
     return name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
+      .replace(/^-+|-+$/g, '')
+  }
 
   const storeProductData = (product: Tool): void => {
     if (typeof window !== 'undefined') {
@@ -188,16 +199,13 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
           tag: product.category,
           tagIcon: '',
           link: product.link,
-        };
-        sessionStorage.setItem(
-          `product_${product.id}`,
-          JSON.stringify(productData)
-        );
+        }
+        sessionStorage.setItem(`product_${product.id}`, JSON.stringify(productData))
       } catch (error) {
-        console.error('Error storing product data:', error);
+        console.error('Error storing product data:', error)
       }
     }
-  };
+  }
 
   return (
     <div className="relative">
@@ -251,16 +259,14 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
                   boxShadow: '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow =
-                    '0 0 2px 0 #24417a14, 2px 2px 9px 0 #290058';
+                  e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 2px 2px 9px 0 #290058'
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow =
-                    '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d';
+                  e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d'
                 }}
               >
                 <div className="absolute top-3 right-3 z-10">
-                  <HeartButton 
+                  <HeartButton
                     tool={tool}
                     isFavorite={isFavorite(tool.id)}
                     onToggle={toggleFavorite}
@@ -275,15 +281,10 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
                         alt={tool.name}
                         className="w-8 h-8 object-contain"
                         onError={(e) => {
-                          const img = e.target as HTMLImageElement;
-                          img.style.display = 'none';
-                          if (
-                            img.nextSibling &&
-                            img.nextSibling instanceof HTMLElement
-                          ) {
-                            (
-                              img.nextSibling as HTMLElement
-                            ).style.display = 'flex';
+                          const img = e.target as HTMLImageElement
+                          img.style.display = 'none'
+                          if (img.nextSibling && img.nextSibling instanceof HTMLElement) {
+                            ;(img.nextSibling as HTMLElement).style.display = 'flex'
                           }
                         }}
                       />
@@ -301,15 +302,10 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
                     <h3 className="font-bold text-lg text-gray-900 truncate flex items-center gap-1 group-hover:text-[#7d42fb] transition-colors">
                       <span className="flex items-center gap-1">
                         {tool.name}
-                        <FiExternalLink
-                          size={14}
-                          className="text-[#7d42fb]"
-                        />
+                        <FiExternalLink size={14} className="text-[#7d42fb]" />
                       </span>
                     </h3>
-                    <p className="text-sm text-gray-500 truncate">
-                      {tool.category}
-                    </p>
+                    <p className="text-sm text-gray-500 truncate">{tool.category}</p>
                   </div>
                 </div>
 
@@ -337,9 +333,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
                 key={index}
                 onClick={() => setCurrentIndex(index)}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentIndex 
-                    ? 'bg-[#7d42fb] w-6' 
-                    : 'bg-gray-300 hover:bg-gray-400'
+                  index === currentIndex ? 'bg-[#7d42fb] w-6' : 'bg-gray-300 hover:bg-gray-400'
                 }`}
               />
             ))}
@@ -347,32 +341,32 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 // Interactive Guide Component
 // Replace the entire AIProductivityGuide component with this dynamic version
 const AICategoryGuide = ({ categoryData }: { categoryData: any }) => {
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null)
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
 
-  if (!categoryData) return null;
+  if (!categoryData) return null
 
-  const keyFeatures = categoryData.keyFeatures || [];
-  const targetUsers = categoryData.targetUsers || [];
-  const useCases = categoryData.useCases || [];
-  const selectionCriteria = categoryData.selectionCriteria || [];
+  const keyFeatures = categoryData.keyFeatures || []
+  const targetUsers = categoryData.targetUsers || []
+  const useCases = categoryData.useCases || []
+  const selectionCriteria = categoryData.selectionCriteria || []
 
   // Icon mapping for different categories
   const getIconForFeature = (feature: string, index: number) => {
-    const icons = [FaBrain, FaRobot, FaCalendarAlt, FaFileAlt, FaPuzzlePiece, FaChartBar];
-    return icons[index % icons.length];
-  };
+    const icons = [FaBrain, FaRobot, FaCalendarAlt, FaFileAlt, FaPuzzlePiece, FaChartBar]
+    return icons[index % icons.length]
+  }
 
   const getUserIcon = (user: string, index: number) => {
-    const icons = [FiTrendingUp, FiUsers, FiZap, FiTarget, '🏠', '💼'];
-    return icons[index % icons.length];
-  };
+    const icons = [FiTrendingUp, FiUsers, FiZap, FiTarget, '🏠', '💼']
+    return icons[index % icons.length]
+  }
 
   return (
     <section className="bg-gradient-to-br from-[#ecf2ff] via-white to-[#f8faff] py-5">
@@ -416,7 +410,7 @@ const AICategoryGuide = ({ categoryData }: { categoryData: any }) => {
             </div>
             <div className="space-y-4">
               {keyFeatures.map((feature: string, index: number) => {
-                const IconComponent = getIconForFeature(feature, index);
+                const IconComponent = getIconForFeature(feature, index)
                 return (
                   <div
                     key={index}
@@ -427,7 +421,7 @@ const AICategoryGuide = ({ categoryData }: { categoryData: any }) => {
                       <span className="font-semibold text-gray-900">{feature}</span>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           </div>
@@ -442,25 +436,27 @@ const AICategoryGuide = ({ categoryData }: { categoryData: any }) => {
             </div>
             <div className="space-y-4">
               {targetUsers.map((user: string, index: number) => {
-                const userIcon = getUserIcon(user, index);
+                const userIcon = getUserIcon(user, index)
                 return (
                   <div
                     key={index}
                     className="p-4 rounded-xl border border-gray-200 hover:border-[#7d42fb] hover:bg-[#7d42fb]/5 transition-all duration-300 cursor-pointer"
-                    onClick={() => setActiveSection(activeSection === `user-${index}` ? null : `user-${index}`)}
+                    onClick={() =>
+                      setActiveSection(activeSection === `user-${index}` ? null : `user-${index}`)
+                    }
                   >
                     <div className="flex items-center gap-3">
                       {typeof userIcon === 'string' ? (
                         <span className="text-xl">{userIcon}</span>
                       ) : (
-                        React.createElement(userIcon, { className: "text-[#7d42fb]", size: 20 })
+                        React.createElement(userIcon, { className: 'text-[#7d42fb]', size: 20 })
                       )}
                       <div>
                         <h4 className="font-semibold text-gray-900">{user}</h4>
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           </div>
@@ -490,55 +486,55 @@ const AICategoryGuide = ({ categoryData }: { categoryData: any }) => {
         </div>
       </div>
     </section>
-  );
-};
+  )
+}
 
 const CategoryPage = () => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
-  const [categoryData, setCategoryData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const router = useRouter()
+  const pathname = usePathname()
+  const [selectedFeature, setSelectedFeature] = useState<string | null>(null)
+  const [categoryData, setCategoryData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     // Get category from URL
-    const path = window.location.pathname;
-    const categorySlug = path.split('/ai-tools/')[1];
-    console.log("CAtegroy slug", categorySlug)
-    
+    const path = window.location.pathname
+    const categorySlug = path.split('/ai-tools/')[1]
+
     if (categorySlug) {
       // Find matching category from AI_TOOLS_CATEGORIES
-      const matchedCategory = AI_TOOLS_FEATURES.find(
-        cat => cat.id.toLowerCase().replace(/\s+/g, '-') === categorySlug
-      );
-      console.log("matchedCategory",matchedCategory)
+      const matchedCategory = AI_TOOLS_CATEGORIES.find(
+        (cat) => cat.id.toLowerCase().replace(/\s+/g, '-') === categorySlug,
+      )
+
       if (matchedCategory) {
-        setCategoryData(matchedCategory);
-        console.log(categoryData)
+        setCategoryData(matchedCategory)
       }
     }
-    setLoading(false);
-  }, []);
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
     // Extract feature from URL path
-    const pathParts = pathname ? pathname.split('/') : [];
-    const lastPath = pathParts[pathParts.length - 1];
-    
+    const pathParts = pathname ? pathname.split('/') : []
+    const lastPath = pathParts[pathParts.length - 1]
+
     // Check if the last part is a feature
-    if (categoryData?.features.some(
-      (      feat: string) => feat.toLowerCase().replace(/[^a-z0-9]+/g, '-') === lastPath
-    )) {
-      setSelectedFeature(lastPath);
+    if (
+      categoryData?.features.some(
+        (feat: string) => feat.toLowerCase().replace(/[^a-z0-9]+/g, '-') === lastPath,
+      )
+    ) {
+      setSelectedFeature(lastPath)
     } else {
-      setSelectedFeature(null);
+      setSelectedFeature(null)
     }
-  }, [pathname, categoryData]);
+  }, [pathname, categoryData])
 
   const handleFeatureClick = (feature: string) => {
-    const featureSlug = feature.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    router.push(`/ai-tools/${featureSlug}`);
-  };
+    const featureSlug = feature.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    router.push(`/ai-tools/features/${featureSlug}`)
+  }
 
   // Generate dummy tools for each feature (increased to 6 for better slider demo)
   const generateDummyTools = (feature: string): Tool[] => {
@@ -552,7 +548,7 @@ const CategoryPage = () => {
         category: categoryData?.title || 'AI Tool',
         click_count: Math.floor(Math.random() * 500) + 50,
         link: `https://example.com/${feature.toLowerCase().replace(/\s+/g, '-')}`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`
+        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
       },
       {
         id: Math.random() * 1000,
@@ -563,7 +559,7 @@ const CategoryPage = () => {
         category: categoryData?.title || 'AI Tool',
         click_count: Math.floor(Math.random() * 500) + 50,
         link: `https://example.com/smart-${feature.toLowerCase().replace(/\s+/g, '-')}`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`
+        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
       },
       {
         id: Math.random() * 1000,
@@ -574,7 +570,7 @@ const CategoryPage = () => {
         category: categoryData?.title || 'AI Tool',
         click_count: Math.floor(Math.random() * 500) + 50,
         link: `https://example.com/${feature.toLowerCase().replace(/\s+/g, '-')}-assistant`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`
+        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
       },
       {
         id: Math.random() * 1000,
@@ -585,7 +581,7 @@ const CategoryPage = () => {
         category: categoryData?.title || 'AI Tool',
         click_count: Math.floor(Math.random() * 500) + 50,
         link: `https://example.com/ultra-${feature.toLowerCase().replace(/\s+/g, '-')}`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`
+        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
       },
       {
         id: Math.random() * 1000,
@@ -596,7 +592,7 @@ const CategoryPage = () => {
         category: categoryData?.title || 'AI Tool',
         click_count: Math.floor(Math.random() * 500) + 50,
         link: `https://example.com/${feature.toLowerCase().replace(/\s+/g, '-')}-master`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`
+        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
       },
       {
         id: Math.random() * 1000,
@@ -607,19 +603,19 @@ const CategoryPage = () => {
         category: categoryData?.title || 'AI Tool',
         click_count: Math.floor(Math.random() * 500) + 50,
         link: `https://example.com/ai-${feature.toLowerCase().replace(/\s+/g, '-')}-hub`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`
-      }
-    ];
-    
-    return baseTools.slice(0, 6); // Return 6 tools for better slider demo
-  };
+        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
+      },
+    ]
+
+    return baseTools.slice(0, 6) // Return 6 tools for better slider demo
+  }
 
   const createFeatureSlug = (feature: string): string => {
     return feature
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
+      .replace(/^-+|-+$/g, '')
+  }
 
   if (loading) {
     return (
@@ -629,7 +625,7 @@ const CategoryPage = () => {
           <p className="text-gray-600">Loading category...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!categoryData) {
@@ -638,15 +634,15 @@ const CategoryPage = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Category Not Found</h1>
           <p className="text-gray-600 mb-6">The category you're looking for doesn't exist.</p>
-          <Link 
-            href="/ai-tools" 
+          <Link
+            href="/ai-tools"
             className="bg-[#7d42fb] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#6b35e0] transition-colors"
           >
             Back to Categories
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -669,9 +665,13 @@ const CategoryPage = () => {
         {/* Breadcrumb */}
         <div className="max-w-6xl mx-auto px-6 mt-8">
           <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-[#7d42fb]">Home</Link>
+            <Link href="/" className="hover:text-[#7d42fb]">
+              Home
+            </Link>
             <span>/</span>
-            <Link href="/ai-tools" className="hover:text-[#7d42fb]">AI Tools</Link>
+            <Link href="/ai-tools" className="hover:text-[#7d42fb]">
+              AI Tools
+            </Link>
             <span>/</span>
             <span className="text-[#7d42fb] font-semibold">{categoryData.title}</span>
           </nav>
@@ -690,21 +690,20 @@ const CategoryPage = () => {
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="space-y-16">
           {categoryData?.features.map((feature: string, index: number) => {
-            const featureSlug = feature.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            
+            const featureSlug = feature.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+
             return (
               <div key={index} className="feature-section">
                 {/* Feature Header */}
                 <div className="flex items-center justify-between mb-8">
                   <div>
-                    <button
-                      onClick={() => handleFeatureClick(feature)}
-                      className="inline-block"
-                    >
+                    <button onClick={() => handleFeatureClick(feature)} className="inline-block">
                       <h2 className="text-2xl md:text-3xl font-bold text-[#7d42fb] mb-2 relative cursor-pointer">
-                        <span className={`border-b-2 border-solid border-[#7d42fb] ${
-                          selectedFeature === featureSlug ? 'text-[#6b35e0]' : ''
-                        }`}>
+                        <span
+                          className={`border-b-2 border-solid border-[#7d42fb] ${
+                            selectedFeature === featureSlug ? 'text-[#6b35e0]' : ''
+                          }`}
+                        >
                           {feature}
                         </span>
                         <FiExternalLink
@@ -719,14 +718,11 @@ const CategoryPage = () => {
                 {/* Tools Slider - Show only if this feature is selected or no feature is selected */}
                 {(!selectedFeature || selectedFeature === featureSlug) && (
                   <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                    <ToolsSlider 
-                      tools={generateDummyTools(feature)} 
-                      featureName={feature}
-                    />
+                    <ToolsSlider tools={generateDummyTools(feature)} featureName={feature} />
                   </div>
                 )}
               </div>
-            );
+            )
           })}
         </div>
       </section>
@@ -734,12 +730,12 @@ const CategoryPage = () => {
       {/* Show AI Productivity Guide only when no specific feature is selected */}
       {!selectedFeature && <AICategoryGuide categoryData={categoryData} />}
     </div>
-  );
-};
+  )
+}
 
-export default CategoryPage;
+export default CategoryPage
 
-<style jsx>{`
+;<style jsx>{`
   .line-clamp-4 {
     display: -webkit-box;
     -webkit-line-clamp: 4;

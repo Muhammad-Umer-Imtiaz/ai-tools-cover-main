@@ -8,15 +8,6 @@ const normalizeFieldName = (fieldName: string): string => {
   return fieldName.toLowerCase().trim().replace(/\s+/g, '_')
 }
 
-// ✅ Remove special characters from a value (only keep alphanumeric + space)
-const stripSpecialChars = (val: unknown): string | undefined => {
-  if (val === null || val === undefined) return undefined
-  return String(val)
-    .replace(/[^0-9a-zA-Z ]+/g, '')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
 // ✅ Required CSV headers
 const REQUIRED_FIELDS = [
   'tool_name',
@@ -114,9 +105,9 @@ export const Media: CollectionConfig = {
                     pricing_plans: record.pricing_plans,
                     final_take: record.final_take,
 
-                    // ✅ Sanitized fields
-                    category: stripSpecialChars(record.category),
-                    pricing: stripSpecialChars(rawPricing),
+                    // ⬇️ Directly use raw values
+                    category: record.category,
+                    pricing: rawPricing,
 
                     // ✅ Default values
                     is_approved: true,

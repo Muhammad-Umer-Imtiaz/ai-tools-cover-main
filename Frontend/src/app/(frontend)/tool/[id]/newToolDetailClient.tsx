@@ -56,6 +56,7 @@ interface SimilarTool {
   link: string;
   image_url: string;
   thumbnail_url: string;
+  overview:string
   description: string;
   tags: string | null;
   created_at: string;
@@ -152,10 +153,10 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
         _id: toolId, // Use _id consistently
         name: tool.name || product.name,
         image: tool.image || product.image || product.logo,
-        overview: tool.overview || '',
         image_url: tool.image_url || product.image || product.logo,
         thumbnail: tool.thumbnail || product.thumbnail,
         thumbnail_url: tool.thumbnail_url || product.thumbnail,
+        overview: tool.overview || product.overview,
         description: tool.description || product.description,
         category: tool.category || product.tag,
         link: tool.link || product.link,
@@ -264,6 +265,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
           image: product.image_url,
           thumbnail: product.thumbnail_url,
           logo: product.image_url,
+          overview:product.overview,
           description: product.description,
           tag: product.category,
           tagIcon: '🤖',
@@ -605,7 +607,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
 
                 {/* Description */}
                 <p className="text-gray-700 text-lg leading-relaxed">
-                  {product.description}
+                  {product.overview}
                 </p>
 
                 {/* Action Buttons */}
@@ -1248,7 +1250,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
             )}
 
           {!similarToolsLoading && similarTools.length > 0 && (
-            <section className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-6 lg:gap-8">
+            <section className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
               {similarTools.map((tool) => (
                 <Link
                   key={tool._id}
@@ -1304,7 +1306,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                     {/* Tool Description - Flexible content area */}
                     <div className="flex-1 flex flex-col min-h-0">
                       <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed flex-shrink-0">
-                        {tool.description}
+                        {tool.overview}
                       </p>
 
                       {/* Tool Tags */}
@@ -1338,7 +1340,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                         >
                           Try Now <FiExternalLink size={12} />
                         </Link>
-                        <div className="text-xs text-gray-500">#{tool._id}</div>
+                        {/* <div className="text-xs text-gray-500">#{tool._id}</div> */}
                       </div>
                     </div>
                   </div>

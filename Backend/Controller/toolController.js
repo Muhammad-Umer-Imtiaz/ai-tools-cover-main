@@ -302,3 +302,31 @@ export const suggestions = async (req, res) => {
     });
   }
 };
+
+export const toolFeature = async (req, res) => {
+  try {
+    const name = req.query.q;
+    if(!name)
+      return res.status(404).json({
+        success: false,
+        message: `Cannot get feature or category name form URL(Params)`,
+      });
+
+    const matchTools = await Tool.find({ category: name });
+    if (!matchTools)
+      return res.status(404).json({
+        success: false,
+        message: `${name} related Tools not Found`,
+      });
+    return res.status(200).json({
+      success:"true",
+      message:"All tools Found Successfully",
+      matchTools
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};

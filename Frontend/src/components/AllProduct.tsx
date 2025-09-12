@@ -39,7 +39,7 @@ interface ProductTool {
   image_url: string;
   thumbnail_url: string;
   description: string;
-  overview?: string;
+  overview: string;
   tags: string;
   created_at: string;
   is_approved: boolean;
@@ -519,6 +519,7 @@ const AllProduct: React.FC = () => {
                       image_url: tool.logo,
                       thumbnail_url: tool.logo,
                       description: tool.description,
+                      overview: tool.overview,
                       tags: tool.category,
                       created_at: '',
                       is_approved: true,
@@ -542,8 +543,8 @@ const AllProduct: React.FC = () => {
 
               {/* Tool Description - Flexible content area */}
               <div className="flex-1 flex flex-col min-h-0">
-                <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 lg:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed flex-shrink-0">
-                  {tool.description}
+                <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 lg:mb-4 line-clamp-2 sm:line-clamp-2 leading-relaxed flex-shrink-0">
+                  {tool.overview}
                 </p>
 
                 {/* Tool Tags - Responsive visibility */}
@@ -581,7 +582,7 @@ const AllProduct: React.FC = () => {
                   >
                     Try Now <FiExternalLink size={12} />
                   </button>
-                  <div className="text-xs text-gray-500">#{tool.id}</div>
+                  {/* <div className="text-xs text-gray-500">#{tool.id}</div> */}
                 </div>
               </div>
             </div>
@@ -639,8 +640,8 @@ const AllProduct: React.FC = () => {
 
               {/* Tool Description - Flexible content area */}
               <div className="flex-1 flex flex-col min-h-0">
-                <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed flex-shrink-0">
-                  {tool.description}
+                <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-2 leading-relaxed flex-shrink-0">
+                  {tool.overview}
                 </p>
 
                 {/* Tool Tags */}
@@ -678,7 +679,7 @@ const AllProduct: React.FC = () => {
                   >
                     Try Now <FiExternalLink size={12} />
                   </button>
-                  <div className="text-xs text-gray-500">#{tool._id}</div>
+                  {/* <div className="text-xs text-gray-500">#{tool._id}</div> */}
                 </div>
               </div>
             </div>

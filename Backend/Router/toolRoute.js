@@ -13,6 +13,7 @@ import {
   Search,
   submitTool,
   suggestions,
+  toolFeature,
 } from "../Controller/toolController.js";
 import { isAuthenticated } from "../Middleware/isAuthenticated.js";
 
@@ -56,5 +57,6 @@ router.get("/search", Search);
 router.get("/pagination", pagination);
 router.get("/category", categoryPagination);
 router.get("/suggestions", suggestions);
+router.get("/toolfeature",toolFeature)
 
 export default router;
