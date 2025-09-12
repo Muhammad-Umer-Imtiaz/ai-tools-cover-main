@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { FiExternalLink, FiHeart, FiChevronLeft, FiChevronRight, FiChevronDown, FiChevronUp, FiUsers, FiTarget, FiZap, FiTrendingUp } from 'react-icons/fi';
 import { FaHeart, FaBrain, FaRobot, FaCalendarAlt, FaFileAlt, FaPuzzlePiece, FaChartBar } from 'react-icons/fa';
-import { AI_TOOLS_CATEGORIES } from '@/constants';
+import { AI_TOOLS_CATEGORIES, AI_TOOLS_FEATURES } from '@/constants';
 import toast from 'react-hot-toast';
 
 interface Tool {
@@ -504,15 +504,17 @@ const CategoryPage = () => {
     // Get category from URL
     const path = window.location.pathname;
     const categorySlug = path.split('/ai-tools/')[1];
+    console.log("CAtegroy slug", categorySlug)
     
     if (categorySlug) {
       // Find matching category from AI_TOOLS_CATEGORIES
-      const matchedCategory = AI_TOOLS_CATEGORIES.find(
+      const matchedCategory = AI_TOOLS_FEATURES.find(
         cat => cat.id.toLowerCase().replace(/\s+/g, '-') === categorySlug
       );
-      
+      console.log("matchedCategory",matchedCategory)
       if (matchedCategory) {
         setCategoryData(matchedCategory);
+        console.log(categoryData)
       }
     }
     setLoading(false);
@@ -520,7 +522,7 @@ const CategoryPage = () => {
 
   useEffect(() => {
     // Extract feature from URL path
-    const pathParts = pathname.split('/');
+    const pathParts = pathname ? pathname.split('/') : [];
     const lastPath = pathParts[pathParts.length - 1];
     
     // Check if the last part is a feature

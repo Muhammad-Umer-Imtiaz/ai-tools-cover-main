@@ -20,7 +20,6 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
   readOnly: readOnlyFromProps,
 }) => {
   const { label } = field
-<<<<<<< HEAD
   const fieldPath = path || field?.name
 
   // ✅ Ensure fieldPath exists BEFORE using useField
@@ -42,28 +41,14 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
 
   // ✅ Destructure with fallback values
   const { value = '', setValue } = fieldHook || {}
-=======
-
-  const checkboxFieldPath = path?.includes('.')
-    ? `${path}.${checkboxFieldPathFromProps}`
-    : checkboxFieldPathFromProps
-
-  const { value, setValue } = useField<string>({ path: path || field.name })
->>>>>>> c0fc529 (Fix issue in Admin Panel Blogs Section)
 
   const { dispatchFields, getDataByPath } = useForm()
 
   const isLocked = useFormFields(([fields]) => {
-<<<<<<< HEAD
     return Boolean(fields[checkboxFieldPathFromProps]?.value)
   })
 
   // ✅ Generate slug from target field
-=======
-    return fields[checkboxFieldPath]?.value as string
-  })
-
->>>>>>> c0fc529 (Fix issue in Admin Panel Blogs Section)
   const handleGenerate = useCallback(
     (e: React.MouseEvent<Element>) => {
       e.preventDefault()
@@ -100,10 +85,7 @@ export const SlugComponent: React.FC<SlugComponentProps> = ({
     [isLocked, checkboxFieldPath, dispatchFields],
   )
 
-<<<<<<< HEAD
   // ✅ Render UI with additional safety checks
-=======
->>>>>>> c0fc529 (Fix issue in Admin Panel Blogs Section)
   return (
     <div className="field-type slug-field-component">
       <div className="label-wrapper">
