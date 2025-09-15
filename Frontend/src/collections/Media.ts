@@ -201,7 +201,7 @@ export const Media: CollectionConfig = {
 
                     await req.payload.create({
                       collection: 'tools',
-                      data: toolData,
+                      data: toolData as any,
                     })
 
                     successCount++
