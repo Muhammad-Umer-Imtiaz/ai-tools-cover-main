@@ -22,13 +22,15 @@ export default function Page() {
           setLoading(false);
           return;
         }
-
+        console.log("Blog Api hitting")
         // 🔹 Fetch from API if not cached
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/posts`, {
           cache: 'no-store'
         });
+    
 
         const data = await res.json();
+        console.log("Blogs ",data)
         // Store with consistent key name
         sessionStorage.setItem("posts", JSON.stringify(data.data));
         setBlogs(data.data || []);
