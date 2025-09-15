@@ -35,15 +35,17 @@ export const listPosts = async (
   { page = 1, pageSize = 20, sort = { _id: -1 }, projection = {} } = {}
 ) => {
   const col = getPostsCollection();
+  console.log("COllection is ",col)
   const skip = (page - 1) * pageSize;
 
   const cursor = col.find(filter, { projection }).sort(sort).skip(skip).limit(pageSize);
   let data = await cursor.toArray();
+  console.log("Data from list post",cursor)
   const total = await col.countDocuments(filter);
-
+  console.log("total ", total)
   // Populate heroImage field
   data = await populateHeroImage(data);
-
+  console.log(data)
   return { data, page, pageSize, total };
 };
 

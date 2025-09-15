@@ -2,6 +2,7 @@ import { listPosts, findPostById } from "../repositories/posts.repo.js";
 
 export const getAllPosts = async (req, res) => {
   try {
+    console.log("Backend working")
     const page = parseInt(req.query.page ?? "1", 10);
     const pageSize = parseInt(req.query.pageSize ?? "20", 10);
 
@@ -9,6 +10,7 @@ export const getAllPosts = async (req, res) => {
     const filter = { _status: "published" };
 
     const { data, total } = await listPosts(filter, { page, pageSize });
+    console.log("Data",data);
 
     return res.status(200).json({
       success: true,
