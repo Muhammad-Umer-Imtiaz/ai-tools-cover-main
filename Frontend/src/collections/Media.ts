@@ -105,14 +105,14 @@ export const Media: CollectionConfig = {
 
             console.log(`✅ Uploaded to Cloudinary: ${uploadResult.secure_url}`)
 
-            await req.payload.update({
-              collection: 'media',
-              id: doc.id,
-              data: {
-                cloudinary_url: uploadResult.secure_url,
-                cloudinary_public_id: uploadResult.public_id,
-              },
-            })
+             await req.payload.update({
+  collection: 'media',
+  id: doc.id,
+  data: {
+    cloudinary_url: String(uploadResult.secure_url),
+    cloudinary_public_id: String(uploadResult.public_id),
+  },
+} as any)
 
             return
           }
