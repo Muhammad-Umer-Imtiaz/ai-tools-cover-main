@@ -197,7 +197,7 @@ export const Posts: CollectionConfig = {
   },
   versions: {
     drafts: {
-      autosave: { interval: 2000 }, // Increased from 100ms to 2000ms to reduce conflicts
+      // autosave: { interval: 2000 },  Increased from 100ms to 2000ms to reduce conflicts
       schedulePublish: true,
     },
     maxPerDoc: 50,
