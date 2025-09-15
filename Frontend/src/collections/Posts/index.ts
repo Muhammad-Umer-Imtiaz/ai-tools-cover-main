@@ -27,7 +27,7 @@ import {
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '@/fields/slug'
 
-export const Posts: CollectionConfig<'posts'> = {
+export const Posts: CollectionConfig = {
   slug: 'posts',
   access: {
     create: authenticated,
@@ -79,13 +79,16 @@ export const Posts: CollectionConfig<'posts'> = {
             {
               name: 'heroImage',
               type: 'upload',
-              relationTo: 'media', // ✅ Connects to Media collection
+              relationTo: 'media',
               required: false,
             },
             {
               name: 'image_url',
               type: 'text',
-              required: false, // ✅ optional (use Cloudinary/external if you want)
+              required: false,
+              admin: {
+                description: 'Optional: External image URL if not using heroImage',
+              },
             },
             {
               name: 'content',
@@ -139,7 +142,7 @@ export const Posts: CollectionConfig<'posts'> = {
               imagePath: 'meta.image',
             }),
             MetaTitleField({ hasGenerateFn: true }),
-            MetaImageField({ relationTo: 'media' }), // ✅ uses Media collection
+            MetaImageField({ relationTo: 'media' }),
             MetaDescriptionField({}),
             PreviewField({
               hasGenerateFn: true,
@@ -194,7 +197,7 @@ export const Posts: CollectionConfig<'posts'> = {
   },
   versions: {
     drafts: {
-      autosave: { interval: 100 },
+      autosave: { interval: 2000 }, // Increased from 100ms to 2000ms to reduce conflicts
       schedulePublish: true,
     },
     maxPerDoc: 50,

@@ -1,9 +1,35 @@
 import mongoose from "mongoose";
 
-// Get a handle to the raw "posts" collection (schema-less)
+// Get raw "posts" collection
 const getPostsCollection = () => mongoose.connection.db.collection("posts");
+// Get raw "media" collection
+const getMediaCollection = () => mongoose.connection.db.collection("media");
 
-// List posts with optional filter + pagination + projection (no schema)
+// ✅ Utility: populate heroImage manually
+const populateHeroImage = async (posts) => {
+  const mediaIds = posts
+    .map((p) => p.heroImage)
+    .filter(Boolean); // remove nulls
+
+  if (mediaIds.length === 0) return posts;
+
+  const { ObjectId } = mongoose.Types;
+  const col = getMediaCollection();
+  const mediaDocs = await col
+    .find({ _id: { $in: mediaIds.map((id) => new ObjectId(id)) } })
+    .toArray();
+
+  const mediaMap = new Map(mediaDocs.map((m) => [m._id.toString(), m]));
+
+  return posts.map((p) => ({
+    ...p,
+    heroImage: p.heroImage
+      ? mediaMap.get(p.heroImage.toString()) ?? p.heroImage
+      : null,
+  }));
+};
+
+// ✅ List posts with pagination + heroImage populated
 export const listPosts = async (
   filter = {},
   { page = 1, pageSize = 20, sort = { _id: -1 }, projection = {} } = {}
@@ -12,25 +38,35 @@ export const listPosts = async (
   const skip = (page - 1) * pageSize;
 
   const cursor = col.find(filter, { projection }).sort(sort).skip(skip).limit(pageSize);
-  const data = await cursor.toArray();
+  let data = await cursor.toArray();
   const total = await col.countDocuments(filter);
+
+  // Populate heroImage field
+  data = await populateHeroImage(data);
 
   return { data, page, pageSize, total };
 };
 
-// Find a single post by _id (works even though no schema)
+// ✅ Find a single post by ID with heroImage populated
 export const findPostById = async (id) => {
   const col = getPostsCollection();
   const { ObjectId } = mongoose.Types;
 
-  // If id isn't a valid ObjectId, return null gracefully
   let _id;
-  try { _id = new ObjectId(id); } catch { return null; }
+  try {
+    _id = new ObjectId(id);
+  } catch {
+    return null;
+  }
 
-  return await col.findOne({ _id });
+  const doc = await col.findOne({ _id });
+  if (!doc) return null;
+
+  const [populatedDoc] = await populateHeroImage([doc]);
+  return populatedDoc;
 };
 
-// (Optional) Insert without schema, if you ever need it
+// (Optional) Insert without schema
 export const insertPost = async (doc) => {
   const col = getPostsCollection();
   const { insertedId } = await col.insertOne(doc);

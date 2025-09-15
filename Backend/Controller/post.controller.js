@@ -5,26 +5,49 @@ export const getAllPosts = async (req, res) => {
     const page = parseInt(req.query.page ?? "1", 10);
     const pageSize = parseInt(req.query.pageSize ?? "20", 10);
 
-    // Example: filter by any field you stored manually, e.g. { status: "published" }
-    const filter = { _status: "published" }; // customize from req.query if you like
+    // ✅ Example filter: only published posts
+    const filter = { _status: "published" };
 
-    const result = await listPosts(filter, { page, pageSize });
-    res.json(result);
+    const { data, total } = await listPosts(filter, { page, pageSize });
+
+    return res.status(200).json({
+      success: true,
+      message:"Get all Blogs",
+      page,
+      pageSize,
+      total,
+      posts: data,
+    });
+
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error fetching posts", error: err?.message });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching posts",
+      error: err?.message,
+    });
   }
 };
 
 export const getPostById = async (req, res) => {
   try {
     const doc = await findPostById(req.params.id);
-    if (!doc) return res.status(404).json({ message: "Post not found" });
-    res.json(doc);
+
+    if (!doc) {
+      return res.status(404).json({
+        success: false,
+        message: "Post not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      post: doc, // ✅ includes populated heroImage now
+    });
   } catch (err) {
-    res
-      .status(500)
-      .json({ message: "Error fetching post", error: err?.message });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching post",
+      error: err?.message,
+    });
   }
 };

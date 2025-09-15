@@ -13,6 +13,7 @@ interface BlogPost {
   publishedAt: string;
   _status: string;
   author?: string;
+  heroImage?: { cloudinary_url: string };
 }
 
 const Page = () => {
@@ -45,7 +46,8 @@ const Page = () => {
 
         if (!res.ok) throw new Error(`Blog post not found: ${res.status}`);
         const data = await res.json();
-        setBlog(data.data || data);
+        console.log(data)
+        setBlog(data.post || data);
       } catch (err) {
         console.error('Error fetching blog post:', err);
         setError('Failed to load blog post');
@@ -221,7 +223,7 @@ const Page = () => {
       {/* Hero Image */}
       <div className="relative h-96 overflow-hidden">
         <img 
-          src={blog.image_url} 
+          src={blog.heroImage?.cloudinary_url} 
           alt={blog.title}
           className="w-full h-full object-cover"
         />
