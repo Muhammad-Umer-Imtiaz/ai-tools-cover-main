@@ -126,6 +126,7 @@ export const Media: CollectionConfig = {
               })
 
               console.log(`Image uploaded to Cloudinary: ${uploadResult.secure_url}`)
+              console.log(`image upload ${uploadResult.public_id}`)
 
               // Use setTimeout to avoid immediate update conflicts
               setTimeout(async () => {
@@ -153,6 +154,7 @@ export const Media: CollectionConfig = {
                   console.error(`Failed to update media document:`, (updateError as Error).message)
                 }
               }, 2000)
+              
 
             } catch (cloudinaryError) {
               console.error(`Cloudinary upload failed for ${doc.filename}:`)
