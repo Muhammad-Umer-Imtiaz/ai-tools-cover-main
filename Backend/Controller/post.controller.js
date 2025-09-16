@@ -10,7 +10,6 @@ export const getAllPosts = async (req, res) => {
     const filter = { _status: "published" };
 
     const { data, total } = await listPosts(filter, { page, pageSize });
-    console.log("Data",data);
 
     return res.status(200).json({
       success: true,
