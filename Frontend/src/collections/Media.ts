@@ -15,18 +15,18 @@ cloudinary.config({
 // Validate Cloudinary configuration
 const validateCloudinaryConfig = (): boolean => {
   const { cloud_name, api_key, api_secret } = cloudinary.config()
-
-  console.log('Cloudinary Config Check:', {
-    cloud_name,
-    api_key: api_key ? 'SET' : 'NOT SET',
-    api_secret: api_secret ? 'SET' : 'NOT SET'
+  
+  console.log('Cloudinary Config Check:', { 
+    cloud_name, 
+    api_key: api_key ? 'SET' : 'NOT SET', 
+    api_secret: api_secret ? 'SET' : 'NOT SET' 
   })
-
+  
   if (!cloud_name || !api_key || !api_secret) {
     console.warn('Cloudinary configuration incomplete. Images will be stored locally.')
     return false
   }
-
+  
   return true
 }
 
@@ -67,19 +67,19 @@ const IMAGE_MIME_TYPES = [
 
 export const Media: CollectionConfig = {
   slug: 'media',
-  upload: {
-    staticDir: '/tmp/uploads', // ephemeral runtime dir
-    mimeTypes: [
-      'image/png',
-      'image/jpeg',
-      'image/webp',
-      'image/jfif',
-      'image/jpg',
-      'image/gif',
-      'application/pdf',
-      'text/csv',
-    ],
-  },
+ upload: {
+  staticDir: '/tmp/uploads', // ephemeral runtime dir
+  mimeTypes: [
+    'image/png',
+    'image/jpeg',
+    'image/webp',
+    'image/jfif',
+    'image/jpg',
+    'image/gif',
+    'application/pdf',
+    'text/csv',
+  ],
+},
 
   access: {
     read: () => true,
@@ -104,7 +104,7 @@ export const Media: CollectionConfig = {
               return
             }
 
-            const filePath = path.join('/tmp/uploads', doc.filename)
+           const filePath = path.join('/tmp/uploads', doc.filename)
 
 
             if (!fs.existsSync(filePath)) {
@@ -114,7 +114,7 @@ export const Media: CollectionConfig = {
 
             try {
               console.log(`Uploading image to Cloudinary: ${doc.filename}`)
-
+              
               const uploadResult = await cloudinary.uploader.upload(filePath, {
                 folder: 'blog-images',
                 public_id: `${Date.now()}_${path.parse(doc.filename).name}`,
@@ -131,15 +131,15 @@ export const Media: CollectionConfig = {
               setTimeout(async () => {
                 try {
                   await req.payload.update({
-                    collection: 'media',
-                    id: doc.id,
-                    data: {
-                      cloudinary_url: String(uploadResult.secure_url),
-                      cloudinary_public_id: String(uploadResult.public_id),
-                    },
-                  } as any)
+  collection: 'media',
+  id: doc.id,
+  data: {
+    cloudinary_url: String(uploadResult.secure_url),
+    cloudinary_public_id: String(uploadResult.public_id),
+  },
+} as any)
                   console.log(`Updated media document with Cloudinary URL`)
-
+                  
                   // Delete local file after successful database update
                   try {
                     if (fs.existsSync(filePath)) {

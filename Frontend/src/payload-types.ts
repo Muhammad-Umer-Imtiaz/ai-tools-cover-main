@@ -102,14 +102,8 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
-  globals: {
-    header: Header;
-    footer: Footer;
-  };
-  globalsSelect: {
-    header: HeaderSelect<false> | HeaderSelect<true>;
-    footer: FooterSelect<false> | FooterSelect<true>;
-  };
+  globals: {};
+  globalsSelect: {};
   locale: null;
   user: User & {
     collection: 'users';
@@ -217,6 +211,10 @@ export interface Post {
   id: string;
   title: string;
   heroImage?: (string | null) | Media;
+  /**
+   * Optional: External image URL if not using heroImage
+   */
+  image_url?: string | null;
   content: {
     root: {
       type: string;
@@ -263,21 +261,8 @@ export interface Post {
 export interface Media {
   id: string;
   alt?: string | null;
-  caption?: {
-    root: {
-      type: string;
-      children: {
-        type: string;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  cloudinary_url?: string | null;
+  cloudinary_public_id?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -289,64 +274,6 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    square?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    small?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    medium?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    large?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    xlarge?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    og?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -375,7 +302,7 @@ export interface Category {
  */
 export interface User {
   id: string;
-  name?: string | null;
+  username: string;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -742,18 +669,19 @@ export interface Form {
  */
 export interface Tool {
   id: string;
+  name: string;
+  is_approved?: boolean | null;
+  link: string;
+  image_url: string;
   /**
-   * Choose how to add tool data
+   * Enter Category
    */
-  uploadMethod?: ('csv' | 'manual') | null;
+  category?: string | null;
+  thumbnail_url: string;
   /**
-   * Upload CSV file with tool data. Required columns: name, link, image_url, thumbnail_url, tags, overview, what_you_can_do_with, key_features, benefits, pricing_plans, tips_best_practices, faqs, final_take, pricing, category
+   * Enter Pricing eg free paid Freemium
    */
-  csvFile?: (string | null) | Media;
-  name?: string | null;
-  link?: string | null;
-  thumbnail_url?: string | null;
-  image_url?: string | null;
+  pricing?: string | null;
   /**
    * Enter tags separated by # (e.g., #translator#legal#education)
    */
@@ -766,7 +694,7 @@ export interface Tool {
    * What users can do with this tool
    */
   what_you_can_do_with?: string | null;
-  key_features?: string | null;
+  key_features: string;
   /**
    * Benefits of using this tool
    */
@@ -787,40 +715,12 @@ export interface Tool {
    * Final thoughts or recommendation
    */
   final_take?: string | null;
-  pricing?: ('Free' | 'Paid' | 'Freemium') | null;
-  category?:
-    | (
-        | 'translators'
-        | 'ai-writing'
-        | 'development'
-        | 'design'
-        | 'marketing'
-        | 'analytics'
-        | 'productivity'
-        | 'education'
-        | 'business'
-        | 'content-creation'
-      )
-    | null;
   /**
    * Rating format: "Rated X out of 5(Y)" where X is rating and Y is number of reviews
    */
   rating?: string | null;
   click_count?: number | null;
   views?: number | null;
-  is_approved?: boolean | null;
-  /**
-   * Processed data from CSV file
-   */
-  processedData?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
   slug?: string | null;
   slugLock?: boolean | null;
   updatedAt: string;
@@ -1227,6 +1127,7 @@ export interface FormBlockSelect<T extends boolean = true> {
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
   heroImage?: T;
+  image_url?: T;
   content?: T;
   relatedPosts?: T;
   categories?: T;
@@ -1257,7 +1158,8 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  caption?: T;
+  cloudinary_url?: T;
+  cloudinary_public_id?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1269,80 +1171,6 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
-  sizes?:
-    | T
-    | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        square?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        small?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        medium?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        large?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        xlarge?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        og?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1369,7 +1197,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
-  name?: T;
+  username?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1392,12 +1220,13 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "tools_select".
  */
 export interface ToolsSelect<T extends boolean = true> {
-  uploadMethod?: T;
-  csvFile?: T;
   name?: T;
+  is_approved?: T;
   link?: T;
-  thumbnail_url?: T;
   image_url?: T;
+  category?: T;
+  thumbnail_url?: T;
+  pricing?: T;
   tags?: T;
   overview?: T;
   what_you_can_do_with?: T;
@@ -1407,13 +1236,9 @@ export interface ToolsSelect<T extends boolean = true> {
   tips_best_practices?: T;
   faqs?: T;
   final_take?: T;
-  pricing?: T;
-  category?: T;
   rating?: T;
   click_count?: T;
   views?: T;
-  is_approved?: T;
-  processedData?: T;
   slug?: T;
   slugLock?: T;
   updatedAt?: T;
@@ -1676,110 +1501,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "header".
- */
-export interface Header {
-  id: string;
-  navItems?:
-    | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: string | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: string | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer".
- */
-export interface Footer {
-  id: string;
-  navItems?:
-    | {
-        link: {
-          type?: ('reference' | 'custom') | null;
-          newTab?: boolean | null;
-          reference?:
-            | ({
-                relationTo: 'pages';
-                value: string | Page;
-              } | null)
-            | ({
-                relationTo: 'posts';
-                value: string | Post;
-              } | null);
-          url?: string | null;
-          label: string;
-        };
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "header_select".
- */
-export interface HeaderSelect<T extends boolean = true> {
-  navItems?:
-    | T
-    | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-            };
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "footer_select".
- */
-export interface FooterSelect<T extends boolean = true> {
-  navItems?:
-    | T
-    | {
-        link?:
-          | T
-          | {
-              type?: T;
-              newTab?: T;
-              reference?: T;
-              url?: T;
-              label?: T;
-            };
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "TaskSchedulePublish".
  */
 export interface TaskSchedulePublish {
@@ -1848,8 +1569,3 @@ export interface Auth {
 declare module 'payload' {
   export interface GeneratedTypes extends Config {}
 }
-
-
-
-
-
