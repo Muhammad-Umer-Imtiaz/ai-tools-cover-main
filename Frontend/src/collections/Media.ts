@@ -15,18 +15,12 @@ cloudinary.config({
 // Validate Cloudinary configuration
 const validateCloudinaryConfig = (): boolean => {
   const { cloud_name, api_key, api_secret } = cloudinary.config()
-  
-  console.log('Cloudinary Config Check:', { 
-    cloud_name, 
-    api_key: api_key ? 'SET' : 'NOT SET', 
-    api_secret: api_secret ? 'SET' : 'NOT SET' 
-  })
-  
+
   if (!cloud_name || !api_key || !api_secret) {
     console.warn('Cloudinary configuration incomplete. Images will be stored locally.')
     return false
   }
-  
+
   return true
 }
 
@@ -67,19 +61,19 @@ const IMAGE_MIME_TYPES = [
 
 export const Media: CollectionConfig = {
   slug: 'media',
- upload: {
-  staticDir: '/tmp/uploads', // ephemeral runtime dir
-  mimeTypes: [
-    'image/png',
-    'image/jpeg',
-    'image/webp',
-    'image/jfif',
-    'image/jpg',
-    'image/gif',
-    'application/pdf',
-    'text/csv',
-  ],
-},
+  upload: {
+    staticDir: '/tmp/uploads', // ephemeral runtime dir
+    mimeTypes: [
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+      'image/jfif',
+      'image/jpg',
+      'image/gif',
+      'application/pdf',
+      'text/csv',
+    ],
+  },
 
   access: {
     read: () => true,
@@ -104,8 +98,7 @@ export const Media: CollectionConfig = {
               return
             }
 
-           const filePath = path.join('/tmp/uploads', doc.filename)
-
+            const filePath = path.join('/tmp/uploads', doc.filename)
 
             if (!fs.existsSync(filePath)) {
               console.warn(`File not found: ${filePath}`)
@@ -114,7 +107,7 @@ export const Media: CollectionConfig = {
 
             try {
               console.log(`Uploading image to Cloudinary: ${doc.filename}`)
-              
+
               const uploadResult = await cloudinary.uploader.upload(filePath, {
                 folder: 'blog-images',
                 public_id: `${Date.now()}_${path.parse(doc.filename).name}`,
@@ -124,6 +117,7 @@ export const Media: CollectionConfig = {
                 use_filename: false,
                 unique_filename: true,
               })
+              console.log("Image uplaod successfull",uploadResult)
 
               console.log(`Image uploaded to Cloudinary: ${uploadResult.secure_url}`)
               console.log(`image upload ${uploadResult.public_id}`)
@@ -131,16 +125,18 @@ export const Media: CollectionConfig = {
               // Use setTimeout to avoid immediate update conflicts
               setTimeout(async () => {
                 try {
-                  const abc =await req.payload.update({
-  collection: 'media',
-  id: doc.id,
-  data: {
-    cloudinary_url: String(uploadResult.secure_url),
-    cloudinary_public_id: String(uploadResult.public_id),
-  },
-} as any)
-                  console.log(`Updated media document with Cloudinary URL`,abc)
-                  
+                  const abc = await req.payload.update({
+                    collection: 'media',
+                    id: doc.id,
+                    data: {
+                      cloudinary_url: String(uploadResult.secure_url),
+                      cloudinary_public_id: String(uploadResult.public_id),
+                    },
+                      
+                  } as any)
+                  console.log(doc.id)
+                  console.log(`Updated media document with Cloudinary URL`, abc)
+
                   // Delete local file after successful database update
                   try {
                     if (fs.existsSync(filePath)) {
@@ -148,14 +144,15 @@ export const Media: CollectionConfig = {
                       console.log(`Local file deleted: ${doc.filename}`)
                     }
                   } catch (deleteError) {
-                    console.warn(`Could not delete local file: ${doc.filename}`, (deleteError as Error).message)
+                    console.warn(
+                      `Could not delete local file: ${doc.filename}`,
+                      (deleteError as Error).message,
+                    )
                   }
                 } catch (updateError) {
                   console.error(`Failed to update media document:`, (updateError as Error).message)
                 }
               }, 2000)
-              
-
             } catch (cloudinaryError) {
               console.error(`Cloudinary upload failed for ${doc.filename}:`)
               console.error(`Error message: ${(cloudinaryError as any).message}`)
@@ -169,10 +166,7 @@ export const Media: CollectionConfig = {
           // Handle CSV processing
           if (doc.mimeType !== 'text/csv') return
 
-          const filePath = path.join(
-            path.resolve(__dirname, '../../public/uploads'),
-            doc.filename
-          )
+          const filePath = path.join(path.resolve(__dirname, '../../public/uploads'), doc.filename)
           const fileContent = fs.readFileSync(filePath, 'utf8')
 
           console.log(`Processing CSV file: ${doc.filename}`)
@@ -194,9 +188,7 @@ export const Media: CollectionConfig = {
 
               console.log(`Parsed ${records.length} records from CSV`)
 
-              const missingFields = REQUIRED_FIELDS.filter(
-                (f) => !(f in (records[0] || {}))
-              )
+              const missingFields = REQUIRED_FIELDS.filter((f) => !(f in (records[0] || {})))
               if (missingFields.length > 0) {
                 console.warn('Missing fields in CSV:', missingFields)
               }
@@ -206,8 +198,7 @@ export const Media: CollectionConfig = {
 
               for (const record of records) {
                 try {
-                  const rawPricing =
-                    record['pricing_(raw)'] ?? record.pricing_raw ?? record.pricing
+                  const rawPricing = record['pricing_(raw)'] ?? record.pricing_raw ?? record.pricing
 
                   const toolData: Record<string, any> = {
                     name: record.tool_name,
@@ -248,7 +239,7 @@ export const Media: CollectionConfig = {
                 } catch (insertError) {
                   console.error(
                     `Failed to insert tool: ${record.tool_name} (${record.category})`,
-                    insertError
+                    insertError,
                   )
                   errorCount++
                 }
@@ -260,9 +251,12 @@ export const Media: CollectionConfig = {
                 fs.unlinkSync(filePath)
                 console.log(`CSV file deleted: ${doc.filename}`)
               } catch (deleteError) {
-                console.warn(`Could not delete CSV file: ${doc.filename}`, (deleteError as Error).message)
+                console.warn(
+                  `Could not delete CSV file: ${doc.filename}`,
+                  (deleteError as Error).message,
+                )
               }
-            }
+            },
           )
         } catch (outerErr) {
           console.error('afterChange hook error:', outerErr)
