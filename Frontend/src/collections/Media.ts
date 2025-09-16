@@ -45,7 +45,7 @@ const REQUIRED_FIELDS = [
   'faqs',
   'final_take',
   'tool_url',
-  'thumnail_url',
+  'thumbnail_url',
   'logo_url',
 ]
 
@@ -93,72 +93,60 @@ export const Media: CollectionConfig = {
         try {
           // Handle image upload to Cloudinary
           if (IMAGE_MIME_TYPES.includes(doc.mimeType)) {
-            if (!isCloudinaryConfigured) {
-              console.log('Cloudinary not configured, keeping image locally')
-              return
-            }
-
-            const filePath = path.join('/tmp/uploads', doc.filename)
-
-            if (!fs.existsSync(filePath)) {
-              console.warn(`File not found: ${filePath}`)
-              return
-            }
-
-            try {
-              console.log(`Uploading image to Cloudinary: ${doc.filename}`)
-
-              const uploadResult = await cloudinary.uploader.upload(filePath, {
-                folder: 'blog-images',
-                public_id: `${Date.now()}_${path.parse(doc.filename).name}`,
-                resource_type: 'auto',
-                overwrite: false,
-                timeout: 30000,
-                use_filename: false,
-                unique_filename: true,
-              })
-              console.log("Image uplaod successfull",uploadResult)
-
-              console.log(`Image uploaded to Cloudinary: ${uploadResult.secure_url}`)
-              console.log(`image upload ${uploadResult.public_id}`)
-
-              // Use setTimeout to avoid immediate update conflicts
-              setTimeout(async () => {
-                try {
-                  const abc = await req.payload.update({
-                    collection: 'media',
-                    id: doc.id,
-                    data: {
-                      cloudinary_url: String(uploadResult.secure_url),
-                      cloudinary_public_id: String(uploadResult.public_id),
-                    },
-                      
-                  } as any)
-                  console.log(doc.id)
-                  console.log(`Updated media document with Cloudinary URL`, abc)
-
-                  // Delete local file after successful database update
-                  try {
-                    if (fs.existsSync(filePath)) {
-                      fs.unlinkSync(filePath)
-                      console.log(`Local file deleted: ${doc.filename}`)
-                    }
-                  } catch (deleteError) {
-                    console.warn(
-                      `Could not delete local file: ${doc.filename}`,
-                      (deleteError as Error).message,
-                    )
-                  }
-                } catch (updateError) {
-                  console.error(`Failed to update media document:`, (updateError as Error).message)
+            (async () => {
+              try {
+                if (!isCloudinaryConfigured) {
+                  console.log('Cloudinary not configured, keeping image locally')
+                  return
                 }
-              }, 2000)
-            } catch (cloudinaryError) {
-              console.error(`Cloudinary upload failed for ${doc.filename}:`)
-              console.error(`Error message: ${(cloudinaryError as any).message}`)
-              console.error(`Error code: ${(cloudinaryError as any).http_code || 'N/A'}`)
-              console.log(`Image will remain stored locally: ${doc.filename}`)
-            }
+
+                const filePath = path.join('/tmp/uploads', doc.filename)
+
+                if (!fs.existsSync(filePath)) {
+                  console.warn(`File not found: ${filePath}`)
+                  return
+                }
+
+                console.log(`Uploading image to Cloudinary: ${doc.filename}`)
+
+                const uploadResult = await cloudinary.uploader.upload(filePath, {
+                  folder: 'blog-images',
+                  public_id: `${Date.now()}_${path.parse(doc.filename).name}`,
+                  resource_type: 'auto',
+                  overwrite: false,
+                  timeout: 60000, // Increased timeout to 60 seconds
+                  use_filename: false,
+                  unique_filename: true,
+                })
+
+                console.log('Image upload successful', uploadResult)
+                console.log(`Image uploaded to Cloudinary: ${uploadResult.secure_url}`)
+                console.log(`Image public ID: ${uploadResult.public_id}`)
+
+                const updatedDoc = await req.payload.update({
+                  collection: 'media',
+                  id: doc.id,
+                  data: {
+                    cloudinary_url: uploadResult.secure_url,
+                    cloudinary_public_id: uploadResult.public_id,
+                  },
+                })
+
+                console.log(`Updated media document with Cloudinary URL: ${doc.id}`, updatedDoc)
+
+                // Delete local file after successful database update
+                if (fs.existsSync(filePath)) {
+                  fs.unlinkSync(filePath)
+                  console.log(`Local file deleted: ${doc.filename}`)
+                }
+              } catch (error: any) {
+                console.error(`Error processing image ${doc.filename}:`, error.message)
+                if (error.http_code) {
+                  console.error(`Cloudinary HTTP code: ${error.http_code}`)
+                }
+                console.log(`Image will remain stored locally: ${doc.filename}`)
+              }
+            })()
 
             return
           }
@@ -166,7 +154,7 @@ export const Media: CollectionConfig = {
           // Handle CSV processing
           if (doc.mimeType !== 'text/csv') return
 
-          const filePath = path.join(path.resolve(__dirname, '../../public/uploads'), doc.filename)
+          const filePath = path.join('/tmp/uploads', doc.filename)
           const fileContent = fs.readFileSync(filePath, 'utf8')
 
           console.log(`Processing CSV file: ${doc.filename}`)
@@ -204,7 +192,7 @@ export const Media: CollectionConfig = {
                     name: record.tool_name,
                     link: record.tool_url,
                     image_url: record.logo_url,
-                    thumbnail_url: record.thumnail_url,
+                    thumbnail_url: record.thumbnail_url,
                     tags: record.tags,
                     overview: record.overview,
                     what_you_can_do_with: record.what_you_can_do_with,
