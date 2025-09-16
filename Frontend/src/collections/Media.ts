@@ -111,8 +111,9 @@ export const Media: CollectionConfig = {
               data: {
                 cloudinary_url: uploadResult.secure_url,
                 cloudinary_public_id: uploadResult.public_id,
-              },
+              } as any,
             })
+            
 
             return
           }
