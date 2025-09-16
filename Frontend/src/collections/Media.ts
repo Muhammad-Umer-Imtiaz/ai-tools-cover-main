@@ -130,7 +130,7 @@ export const Media: CollectionConfig = {
                     cloudinary_url: uploadResult.secure_url,
                     cloudinary_public_id: uploadResult.public_id,
                   },
-                })
+                } as any)
 
                 console.log(`Updated media document with Cloudinary URL: ${doc.id}`, updatedDoc)
 
