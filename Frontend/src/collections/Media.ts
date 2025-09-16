@@ -131,7 +131,7 @@ export const Media: CollectionConfig = {
               // Use setTimeout to avoid immediate update conflicts
               setTimeout(async () => {
                 try {
-                  await req.payload.update({
+                  const abc =await req.payload.update({
   collection: 'media',
   id: doc.id,
   data: {
@@ -139,7 +139,7 @@ export const Media: CollectionConfig = {
     cloudinary_public_id: String(uploadResult.public_id),
   },
 } as any)
-                  console.log(`Updated media document with Cloudinary URL`)
+                  console.log(`Updated media document with Cloudinary URL`,abc)
                   
                   // Delete local file after successful database update
                   try {
