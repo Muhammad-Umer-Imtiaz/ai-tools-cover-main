@@ -29,7 +29,7 @@ import { AI_TOOLS_CATEGORIES } from '@/constants'
 import toast from 'react-hot-toast'
 
 interface Tool {
-  id: number
+  _id: number
   name: string
   overview: string
   image_url?: string
@@ -80,9 +80,9 @@ const useFavorites = () => {
   }
 
   const removeFromFavorites = (toolId: number) => {
-    const toolToRemove = favorites.find((tool) => tool.id === toolId)
+    const toolToRemove = favorites.find((tool) => tool._id === toolId)
 
-    const updatedFavorites = favorites.filter((tool) => tool.id !== toolId)
+    const updatedFavorites = favorites.filter((tool) => tool._id !== toolId)
     setFavorites(updatedFavorites)
     if (typeof window !== 'undefined') {
       localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites))
@@ -103,12 +103,12 @@ const useFavorites = () => {
   }
 
   const isFavorite = (toolId: number) => {
-    return favorites.some((tool) => tool.id === toolId)
+    return favorites.some((tool) => tool._id === toolId)
   }
 
-  const toggleFavorite = (tool: { id: number }) => {
-    if (isFavorite(tool.id)) {
-      removeFromFavorites(tool.id)
+  const toggleFavorite = (tool: { _id: number }) => {
+    if (isFavorite(tool._id)) {
+      removeFromFavorites(tool._id)
     } else {
       addToFavorites(tool)
     }
@@ -193,7 +193,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
     if (typeof window !== 'undefined') {
       try {
         const productData = {
-          id: product.id.toString(),
+          _id: product._id.toString(),
           name: product.name,
           thumbnail: product.thumbnail_url,
           logo: product.image_url,
@@ -202,7 +202,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
           tagIcon: '',
           link: product.link,
         }
-        sessionStorage.setItem(`product_${product.id}`, JSON.stringify(productData))
+        sessionStorage.setItem(`product_${product._id}`, JSON.stringify(productData))
       } catch (error) {
         console.error('Error storing product data:', error)
       }
@@ -249,7 +249,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 px-8">
           {getCurrentTools().map((tool) => (
             <Link
-              key={tool.id}
+              key={tool._id}
               href={`/tool/${createToolSlug(tool.name)}`}
               onClick={() => storeProductData(tool)}
             >
@@ -270,7 +270,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
                 <div className="absolute top-3 right-3 z-10">
                   <HeartButton
                     tool={tool}
-                    isFavorite={isFavorite(tool.id)}
+                    isFavorite={isFavorite(tool._id)}
                     onToggle={toggleFavorite}
                   />
                 </div>
@@ -569,7 +569,7 @@ const CategoryPage = () => {
   const handleFeatureClick = (feature: string) => {
     const featureSlug = feature.toLowerCase().replace(/[^a-z0-9]+/g, '-')
     router.push(`/ai-tools/features/${featureSlug}`)
-  }  
+  }
 
   const createFeatureSlug = (feature: string): string => {
     return feature
@@ -679,7 +679,7 @@ const CategoryPage = () => {
                 {/* Tools Slider - Show only if this feature is selected or no feature is selected */}
                 {(!selectedFeature || selectedFeature === featureSlug) && (
                   <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-<ToolsSlider tools={toolsData[featureSlug] || []} featureName={feature} />
+                    <ToolsSlider tools={toolsData[featureSlug] || []} featureName={feature} />
                   </div>
                 )}
               </div>
