@@ -124,6 +124,60 @@ export const submitTool = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
+export const getSingleTool = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    console.log("Slug received:", slug);
+
+    if (!slug) {
+      return res
+        .status(404)
+        .json({ message: "Tool Slug not Found", success: false });
+    }
+
+    const tool = await Tool.findOne({
+      name: { $regex: `^${slug}$`, $options: "i" },
+    });
+    if (!tool) {
+      return res
+        .status(404)
+        .json({ message: "Tool not Found", success: false });
+    }
+
+    return res.status(200).json({ message: "Tool Found", success: true, tool });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+      success: false,
+    });
+  }
+};
+
+export const FeaturedTools = async (req, res) => {
+  try {
+    // ✅ fetch latest 6 approved tools (if you have is_approved filter, keep it)
+    const tools = await Tool.find({ is_approved: true })
+      .sort({ createdAt: -1 }) // newest first
+      .limit(6);
+
+    return res.status(200).json({
+      message: "Featured Tools Found",
+      success: true,
+      count: tools.length,
+      tools,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+      success: false,
+    });
+  }
+};
+
+
 export const findToolByUser = async (req, res) => {
   try {
     const id = req.user._id;
@@ -173,15 +227,16 @@ export const getAllTools = async (req, res) => {
 export const pagination = async (req, res) => {
   try {
     const page = parseInt(req.query.offset) || 1;
-
     const limit = parseInt(req.query.limit) || 20;
-
     const skip = (page - 1) * limit;
 
     const query = { is_approved: true };
 
     const [results, total] = await Promise.all([
-      Tool.find(query).skip(skip).limit(limit),
+      Tool.find(query)
+        .sort({ createdAt: -1 }) // ✅ latest first
+        .skip(skip)
+        .limit(limit),
       Tool.countDocuments(query),
     ]);
 
@@ -240,7 +295,7 @@ export const categoryPagination = async (req, res) => {
     const query = { is_approved: true, category: categoryName };
 
     const [results, total] = await Promise.all([
-      Tool.find(query).skip(offset).limit(limit),
+      Tool.find(query).skip(offset).limit(limit).sort({ createdAt: -1 }),
       Tool.countDocuments(query),
     ]);
 
@@ -282,7 +337,7 @@ export const suggestions = async (req, res) => {
     };
 
     const [results, total] = await Promise.all([
-      Tool.find(query).skip(skip).limit(limit),
+      Tool.find(query).skip(skip).limit(limit).sort({ createdAt: -1 }),
       Tool.countDocuments(query),
     ]);
 
@@ -306,7 +361,7 @@ export const suggestions = async (req, res) => {
 export const toolFeature = async (req, res) => {
   try {
     const name = req.query.q;
-    if(!name)
+    if (!name)
       return res.status(404).json({
         success: false,
         message: `Cannot get feature or category name form URL(Params)`,
@@ -319,10 +374,10 @@ export const toolFeature = async (req, res) => {
         message: `${name} related Tools not Found`,
       });
     return res.status(200).json({
-      success:"true",
-      message:"All tools Found Successfully",
-      matchTools
-    })
+      success: "true",
+      message: "All tools Found Successfully",
+      matchTools,
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error",

@@ -3,7 +3,7 @@ export const NAV_LINKS = [
   // { href: "/category", key: "ai_categories", label: "Categories" },
   { href: '/ai-agents', key: 'ai_agents', label: 'AI Agents' },
   { href: '/ai-tools', key: 'ai_tools', label: 'AI Tools' },
-  { href: '/blogs', key: 'blogs', label: "Blogs" },
+  { href: '/blogs', key: 'blogs', label: 'Blogs' },
   { href: '/gpts', key: 'gpts ', label: 'GPTs ' },
   { href: '/prompts', key: 'prompts', label: 'Prompts' },
   { href: '/top-picks', key: 'top_picks', label: 'Top Picks' },
@@ -11,13 +11,13 @@ export const NAV_LINKS = [
   { href: '/signup', key: 'signup', label: 'Signup' },
   // { href: "/favorites", key: "favorites", label: "Favorites" },
   { href: '/submit', key: 'submit', label: 'Submit' },
-];
+]
 
 export const categories = [
-  { label: 'Personal Assitant', emoji: '👤' },
-  { label: 'Research', emoji: '🔍' },
-  { label: 'Spreadsheets', emoji: '📊' },
-  { label: 'Presenations', emoji: '📽️' },
+  // { label: 'Personal Assitant', emoji: '👤' },
+  // { label: 'Research', emoji: '🔍' },
+  // { label: 'Spreadsheet', emoji: '📊' },
+  { label: 'Presentations', emoji: '📽️' },
   { label: 'Website Builders', emoji: '🌐' },
   { label: 'Marketing', emoji: '📢' },
   { label: 'Social Media', emoji: '💬' },
@@ -26,7 +26,7 @@ export const categories = [
   { label: 'Video Generators', emoji: '📹' },
   { label: 'Prompt Generators', emoji: '💡' },
   { label: 'Writing Generators', emoji: '✍️' },
-  { label: 'Email Generators', emoji: '📧' },
+  // { label: 'Email Generators', emoji: '📧' },
   { label: 'Design Generators', emoji: '🎨' },
   { label: 'Image Generators', emoji: '🖼️' },
   { label: 'Workflows', emoji: '⚙️' },
@@ -37,49 +37,48 @@ export const categories = [
   { label: 'Text To Speech', emoji: '🗣️' },
   { label: 'Code assistant', emoji: '💻' },
   { label: 'Other', emoji: '✨' },
-];
-
+]
 
 export interface AITool {
-  id: number;
-  name: string;
-  description: string;
-  image_url: string;
-  thumbnail_url: string;
-  category: string;
-  click_count: number;
-  link: string;
-  views: string;
-  rating: number;
-  pricing: string;
-  tags: string[];
+  id: number
+  name: string
+  description: string
+  image_url: string
+  thumbnail_url: string
+  category: string
+  click_count: number
+  link: string
+  views: string
+  rating: number
+  pricing: string
+  tags: string[]
 }
 
 export interface AIToolFeatures {
-  id: string;
-  title: string;
-  metaTitle: string;
-  metaDescription: string;
-  focusKeywords: string[];
-  mainHeading: string;
-  introText: string;
-  definition?: string;
-  capabilities: string[];
-  keyFeatures?: string[];
+  id: string
+  title: string
+  metaTitle: string
+  metaDescription: string
+  focusKeywords: string[]
+  mainHeading: string
+  introText: string
+  definition?: string
+  capabilities: string[]
+  keyFeatures?: string[]
   targetAudience: {
-    icon?: string;
-    title: string;
-    description: string;
-  }[];
+    icon?: string
+    title: string
+    description: string
+  }[]
 
   howToChoose: {
-    criterion: string;
-    description: string;
-    icon: string;
-  }[];
-  image: string;
-  description: string;
-  color: string;
+    criterion: string
+    description: string
+    icon: string
+  }[]
+  image: string
+  description: string
+  color: string
   // Removed tools array
 }
 
@@ -166,11 +165,9 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'personal-assistant',
     title: 'Personal Assistant',
     image: '/category_asset/personal-assistant.jpg',
-    description:
-      'AI-powered personal assistants to manage your daily tasks and schedule',
+    description: 'AI-powered personal assistants to manage your daily tasks and schedule',
     color: 'text-purple-600',
-    metaTitle:
-      'Best AI Personal Assistant Tools 2025 – Smart AI Helpers for Daily Life',
+    metaTitle: 'Best AI Personal Assistant Tools 2025 – Smart AI Helpers for Daily Life',
     metaDescription:
       'Explore the top AI personal assistant tools of 2025 to help with scheduling, productivity, reminders, communication, and smart automation. Discover the best AI helpers on AI Tools Cover.',
     focusKeywords: [
@@ -200,13 +197,11 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
       },
       {
         title: 'Students',
-        description:
-          'Stay organized with reminders, schedules, and quick notes',
+        description: 'Stay organized with reminders, schedules, and quick notes',
       },
       {
         title: 'Remote Workers',
-        description:
-          'Coordinate meetings, track productivity, and manage emails',
+        description: 'Coordinate meetings, track productivity, and manage emails',
       },
     ],
 
@@ -242,11 +237,9 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'spreadsheets',
     title: 'Spreadsheet Assistant',
     image: '/category_asset/spreadsheets.jpg',
-    description:
-      'AI-enhanced spreadsheet tools for data analysis and automation',
+    description: 'AI-enhanced spreadsheet tools for data analysis and automation',
     color: 'text-green-600',
-    metaTitle:
-      'Top AI Spreadsheet Assistant Tools (2025) – Automate Excel & Google Sheets with AI',
+    metaTitle: 'Top AI Spreadsheet Assistant Tools (2025) – Automate Excel & Google Sheets with AI',
     metaDescription:
       'Explore the best AI spreadsheet assistants in 2025 to automate formulas, clean data, and analyze sheets faster in Excel & Google Sheets. Browse free & paid tools on AI Tools Cover.',
     focusKeywords: [
@@ -345,8 +338,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     image: '/category_asset/translation.jpg',
     description: 'AI-powered translation tools for multiple languages',
     color: 'text-cyan-600',
-    metaTitle:
-      'Best AI Translation Tools (2025) – Real-Time & Multilingual Translators',
+    metaTitle: 'Best AI Translation Tools (2025) – Real-Time & Multilingual Translators',
     metaDescription:
       'Discover the top AI translator tools in 2025 for real-time, accurate, multilingual translation. Perfect for content creators, travelers, and businesses. Explore now on AI Tools Cover.',
     focusKeywords: [
@@ -441,8 +433,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     image: '/category_asset/presentations.jpg',
     description: 'AI tools for creating stunning presentations and slides',
     color: 'text-orange-600',
-    metaTitle:
-      'Top AI Presentation Tools (2025) – Create Stunning Slides in Seconds',
+    metaTitle: 'Top AI Presentation Tools (2025) – Create Stunning Slides in Seconds',
     metaDescription:
       'Discover the best AI-powered tools to design, write, and visualize presentations effortlessly. From pitch decks to educational slides, explore free and paid tools now on AI Tools Cover.',
     focusKeywords: [
@@ -548,8 +539,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     image: '/category_asset/email-assistants.jpg',
     description: 'AI assistants for managing and organizing emails efficiently',
     color: 'text-pink-600',
-    metaTitle:
-      'Top AI Email Assistant Tools (2025) – Write Better Emails, Faster',
+    metaTitle: 'Top AI Email Assistant Tools (2025) – Write Better Emails, Faster',
     metaDescription:
       'Discover the best AI email writing assistants of 2025. Generate, edit, and reply to emails effortlessly with tools powered by GPT, automation, and smart templates. Browse free and paid tools now on AI Tools Cover.',
     focusKeywords: [
@@ -651,8 +641,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     image: '/category_asset/search-engine.jpg',
     description: 'AI-powered search engines for enhanced information discovery',
     color: 'text-indigo-600',
-    metaTitle:
-      'Top AI Search Engine Tools (2025) – Smarter Search, Better Results',
+    metaTitle: 'Top AI Search Engine Tools (2025) – Smarter Search, Better Results',
     metaDescription:
       'Explore the best AI-powered search engines for research, productivity, and discovery. From ChatGPT-based search to real-time knowledge engines, browse the latest AI tools for smarter searching on AI Tools Cover.',
     focusKeywords: [
@@ -753,11 +742,9 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'website-builders',
     title: 'Website Builders',
     image: '/category_asset/website-builder.jpg',
-    description:
-      'AI-powered website builders for creating professional sites without coding',
+    description: 'AI-powered website builders for creating professional sites without coding',
     color: 'text-blue-600',
-    metaTitle:
-      'Best AI Website Builders available in 2025 – Build Stunning Sites with AI',
+    metaTitle: 'Best AI Website Builders available in 2025 – Build Stunning Sites with AI',
     metaDescription:
       'Explore the top AI-powered website builders of 2025 to create professional websites without coding. Find AI Website builder platforms with auto-design, content generation, SEO guidance, and responsive layouts—all on AI Tools Cover.',
     focusKeywords: [
@@ -848,8 +835,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'marketing',
     title: 'Marketing',
     image: '/category_asset/marketing.jpg',
-    description:
-      'AI-powered marketing tools for campaign automation and performance optimization',
+    description: 'AI-powered marketing tools for campaign automation and performance optimization',
     color: 'text-green-600',
     metaTitle: 'Supercharge Campaigns: AI Marketing Tools for 2025',
     metaDescription:
@@ -930,11 +916,9 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'finance',
     title: 'Finance',
     image: '/category_asset/finance.jpg',
-    description:
-      'AI-powered finance tools for budgeting, analysis, and financial planning',
+    description: 'AI-powered finance tools for budgeting, analysis, and financial planning',
     color: 'text-emerald-600',
-    metaTitle:
-      'AI Finance Tools (2025) – Smarter Budgeting, Analysis & Financial Planning',
+    metaTitle: 'AI Finance Tools (2025) – Smarter Budgeting, Analysis & Financial Planning',
     metaDescription:
       'Discover the top AI-powered finance tools of 2025. From budgeting and forecasting to expense tracking and wealth management, explore AI tools that simplify your financial decisions.',
     focusKeywords: [
@@ -1035,8 +1019,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered project management tools for planning, tracking, and team collaboration',
     color: 'text-purple-600',
-    metaTitle:
-      'Top AI Project Management Tools (2025) – Plan, Track & Deliver Smarter',
+    metaTitle: 'Top AI Project Management Tools (2025) – Plan, Track & Deliver Smarter',
     metaDescription:
       'Discover top AI project management tools for 2025. From task automation and deadline prediction to team collaboration and workflow optimization—manage projects smarter with AI assistance.',
     focusKeywords: [
@@ -1136,8 +1119,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered social media tools for content creation, scheduling, and audience engagement',
     color: 'text-pink-600',
-    metaTitle:
-      'Smartest AI Social Media Tools (2025) – Automate, Create & Grow Your Brand',
+    metaTitle: 'Smartest AI Social Media Tools (2025) – Automate, Create & Grow Your Brand',
     metaDescription:
       'Discover the best AI-powered social media tools of 2025. From content generation and scheduling to analytics and audience engagement—boost your social strategy using intelligent automation.',
     focusKeywords: [
@@ -1238,8 +1220,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered education tools for personalized learning, teaching assistance, and assessment',
     color: 'text-yellow-600',
-    metaTitle:
-      'Top AI Tools for Education (2025) – Smarter Learning, Teaching & Assessment',
+    metaTitle: 'Top AI Tools for Education (2025) – Smarter Learning, Teaching & Assessment',
     metaDescription:
       'Explore the best AI-powered education tools of 2025. From personalized tutoring to lesson planning and grading automation—AI is reshaping the future of learning. Discover tools for students, teachers, and institutions.',
     focusKeywords: [
@@ -1340,8 +1321,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered e-commerce tools for store automation, product optimization, and customer engagement',
     color: 'text-orange-600',
-    metaTitle:
-      'AI Tools for E-Commerce (2025) – Power Your Online Store with Smart Automation',
+    metaTitle: 'AI Tools for E-Commerce (2025) – Power Your Online Store with Smart Automation',
     metaDescription:
       "Discover the best AI-powered e-commerce tools in 2025. From product descriptions and pricing optimization to inventory automation and customer engagement—boost your store's performance with AI.",
     focusKeywords: [
@@ -1444,8 +1424,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered SEO tools for keyword research, content optimization, and ranking improvement',
     color: 'text-teal-600',
-    metaTitle:
-      'Top AI SEO Tools (2025) – Boost Rankings with Smarter Optimization',
+    metaTitle: 'Top AI SEO Tools (2025) – Boost Rankings with Smarter Optimization',
     metaDescription:
       'Discover the best AI-powered SEO tools of 2025. From keyword research and on-page optimization to content scoring and SERP tracking, supercharge your SEO strategy with AI Tools Cover.',
     focusKeywords: [
@@ -1546,8 +1525,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered customer support tools for automated assistance, ticketing, and user engagement',
     color: 'text-cyan-600',
-    metaTitle:
-      'AI Customer Support Tools (2025) – Automate Help, Boost Satisfaction',
+    metaTitle: 'AI Customer Support Tools (2025) – Automate Help, Boost Satisfaction',
     metaDescription:
       'Explore the top AI customer support tools of 2025. From live chatbots and support ticket automation to sentiment analysis and 24/7 virtual assistants, enhance your customer experience with AI Tools Cover.',
     focusKeywords: [
@@ -1649,8 +1627,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered human resources tools for recruitment automation, performance analytics, and employee engagement management',
     color: 'text-purple-600',
-    metaTitle:
-      'Best AI Tools for Human Resources (2025) – Smarter Hiring & Talent Management',
+    metaTitle: 'Best AI Tools for Human Resources (2025) – Smarter Hiring & Talent Management',
     metaDescription:
       'Explore the top AI HR tools of 2025. From recruitment automation to performance analytics and employee engagement, discover how AI is transforming human resource management. Only on AI Tools Cover.',
     focusKeywords: [
@@ -1752,8 +1729,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered sales automation tools for outreach, lead qualification, and conversion optimization',
     color: 'text-red-600',
-    metaTitle:
-      'Best AI Sales Assistant Tools (2025) – Close More Deals, Smarter & Faster',
+    metaTitle: 'Best AI Sales Assistant Tools (2025) – Close More Deals, Smarter & Faster',
     metaDescription:
       'Discover the top AI-powered sales assistants of 2025. Automate outreach, qualify leads, draft follow-ups, and boost conversions using intelligent tools on AI Tools Cover.',
     focusKeywords: [
@@ -1855,8 +1831,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered stock trading platforms for market analysis, predictive insights, and automated trading strategies',
     color: 'text-green-600',
-    metaTitle:
-      'Top AI Stock Trading Tools (2025) – Smarter Investing with AI Insights',
+    metaTitle: 'Top AI Stock Trading Tools (2025) – Smarter Investing with AI Insights',
     metaDescription:
       'Discover the best AI-powered stock trading platforms of 2025. Analyze market trends, predict price movements, and automate trades with top tools featured on AI Tools Cover.',
     focusKeywords: [
@@ -1931,8 +1906,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
       },
       {
         criterion: 'Asset class support',
-        description:
-          'supports your preferred asset classes (stocks, ETFs, crypto)',
+        description: 'supports your preferred asset classes (stocks, ETFs, crypto)',
         icon: '📈',
       },
       {
@@ -1959,8 +1933,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered legal tools for contract analysis, document automation, and legal research assistance',
     color: 'text-gray-600',
-    metaTitle:
-      'AI Legal Tools in 2025 – Streamline Legal Work with Smart AI Assistants',
+    metaTitle: 'AI Legal Tools in 2025 – Streamline Legal Work with Smart AI Assistants',
     metaDescription:
       'Explore top AI-powered legal tools of 2025 to draft contracts, review documents, analyze case law, and streamline compliance. Find free and premium tools now on AI Tools Cover.',
     focusKeywords: [
@@ -2030,8 +2003,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     howToChoose: [
       {
         criterion: 'Practice area support',
-        description:
-          'supports your practice area (corporate law, litigation, compliance)',
+        description: 'supports your practice area (corporate law, litigation, compliance)',
         icon: '📚',
       },
       {
@@ -2063,8 +2035,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI tools specifically designed for educators to enhance teaching, automate grading, and personalize learning',
     color: 'text-blue-600',
-    metaTitle:
-      'Top AI Tools for Teachers in 2025 – Boost Classroom Engagement & Save Time',
+    metaTitle: 'Top AI Tools for Teachers in 2025 – Boost Classroom Engagement & Save Time',
     metaDescription:
       'Discover the best AI tools for teachers to automate grading, create lesson plans, personalize learning, and enhance classroom engagement. Compare the top free and premium tools at AI Tools Cover.',
     focusKeywords: [
@@ -2167,8 +2138,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI tools tailored for startup founders and entrepreneurs to accelerate business development and growth',
     color: 'text-violet-600',
-    metaTitle:
-      'AI Tools for Startups in 2025 – Launch & Scale Smarter with Startup Assistants',
+    metaTitle: 'AI Tools for Startups in 2025 – Launch & Scale Smarter with Startup Assistants',
     metaDescription:
       'Discover the top AI-powered startup assistant tools in 2025 to streamline business planning, branding, marketing, fundraising, and product development. Compare free and paid tools now on AI Tools Cover.',
     focusKeywords: [
@@ -2243,8 +2213,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
       },
       {
         criterion: 'Integration capability',
-        description:
-          'integrates with your current stack (Notion, Zapier, Stripe)',
+        description: 'integrates with your current stack (Notion, Zapier, Stripe)',
         icon: '📈',
       },
       {
@@ -2254,14 +2223,12 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
       },
       {
         criterion: 'Output quality',
-        description:
-          'generates unique and valuable outputs (decks, apps, copy)',
+        description: 'generates unique and valuable outputs (decks, apps, copy)',
         icon: '🧠',
       },
       {
         criterion: 'Investor readiness',
-        description:
-          'can be used for investor communication, validation, or MVP builds',
+        description: 'can be used for investor communication, validation, or MVP builds',
         icon: '📊',
       },
     ],
@@ -2273,8 +2240,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered real estate tools for property analysis, lead generation, and automated listing management',
     color: 'text-indigo-600',
-    metaTitle:
-      'AI Tools for Real Estate (2025) – Automate Listings, Leads & Closings',
+    metaTitle: 'AI Tools for Real Estate (2025) – Automate Listings, Leads & Closings',
     metaDescription:
       'Explore the best AI real estate tools of 2025 to streamline property listings, client engagement, market analysis, and lead generation. Discover top tools for agents, brokers, and investors on AI Tools Cover.',
     focusKeywords: [
@@ -2345,8 +2311,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     howToChoose: [
       {
         criterion: 'Niche support',
-        description:
-          'supports your niche (residential, commercial, rental, etc.)',
+        description: 'supports your niche (residential, commercial, rental, etc.)',
         icon: '📍',
       },
       {
@@ -2380,8 +2345,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered video enhancement tools for upscaling resolution, reducing noise, and improving video quality',
     color: 'text-green-600',
-    metaTitle:
-      'Best AI Video Enhancer Tools (2025) – Upscale & Restore Video Quality',
+    metaTitle: 'Best AI Video Enhancer Tools (2025) – Upscale & Restore Video Quality',
     metaDescription:
       'Discover top AI video enhancer tools to upscale resolution, remove noise, and restore old footage. Transform blurry videos into HD/4K quality with AI-powered enhancement on AI Tools Cover.',
     focusKeywords: [
@@ -2477,8 +2441,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered video editing tools for automated cutting, effects, and post-production workflows',
     color: 'text-blue-600',
-    metaTitle:
-      'Best AI Video Editing Tools (2025) – Edit Videos Faster with AI Automation',
+    metaTitle: 'Best AI Video Editing Tools (2025) – Edit Videos Faster with AI Automation',
     metaDescription:
       'Explore top AI video editing tools that automate cutting, add effects, generate captions, and streamline post-production. Perfect for YouTubers, marketers, and content creators on AI Tools Cover.',
     focusKeywords: [
@@ -2576,8 +2539,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered video generation tools for creating videos from text, images, and prompts automatically',
     color: 'text-purple-600',
-    metaTitle:
-      'Best AI Video Generator Tools (2025) – Create Videos from Text & Ideas',
+    metaTitle: 'Best AI Video Generator Tools (2025) – Create Videos from Text & Ideas',
     metaDescription:
       'Discover top AI video generators that create videos from scripts, images, and prompts. Transform ideas into engaging content instantly with automated video creation on AI Tools Cover.',
     focusKeywords: [
@@ -2681,8 +2643,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI tools that convert text content into video format with automated visuals and narration',
     color: 'text-red-600',
-    metaTitle:
-      'Best AI Text to Video Tools (2025) – Transform Text into Engaging Videos',
+    metaTitle: 'Best AI Text to Video Tools (2025) – Transform Text into Engaging Videos',
     metaDescription:
       'Explore top AI text-to-video tools that convert scripts, blog posts, and articles into engaging videos automatically. Create visual content from text instantly on AI Tools Cover.',
     focusKeywords: [
@@ -2786,8 +2747,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI tools for generating effective prompts and commands to optimize AI model outputs',
     color: 'text-purple-600',
-    metaTitle:
-      'Best AI Prompt Generator Tools (2025) – Supercharge Your ChatGPT & AI Outputs',
+    metaTitle: 'Best AI Prompt Generator Tools (2025) – Supercharge Your ChatGPT & AI Outputs',
     metaDescription:
       'Explore the top AI prompt generator tools of 2025 to create high-quality prompts for ChatGPT, MidJourney, Claude, and other LLMs. Get better results with structured, creative, and optimized prompts.',
     focusKeywords: [
@@ -2849,21 +2809,18 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
       {
         icon: '🔍',
         title: 'AI Enthusiasts',
-        description:
-          'seeking more accurate, creative, or targeted AI responses',
+        description: 'seeking more accurate, creative, or targeted AI responses',
       },
     ],
     howToChoose: [
       {
         criterion: 'AI compatibility',
-        description:
-          'compatible with your AI tool (ChatGPT, MidJourney, Claude)',
+        description: 'compatible with your AI tool (ChatGPT, MidJourney, Claude)',
         icon: '🧠',
       },
       {
         criterion: 'Template variety',
-        description:
-          'includes templates for your use-case (marketing, writing, coding)',
+        description: 'includes templates for your use-case (marketing, writing, coding)',
         icon: '🎯',
       },
       {
@@ -2887,11 +2844,9 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'writing-generators',
     title: 'Writing Generators',
     image: '/category_asset/writing-generators.jpg',
-    description:
-      'AI-powered writing tools for content creation and automated text generation',
+    description: 'AI-powered writing tools for content creation and automated text generation',
     color: 'text-blue-600',
-    metaTitle:
-      'Top AI Writing Generator Tools (2025) – Instantly Create Content with AI',
+    metaTitle: 'Top AI Writing Generator Tools (2025) – Instantly Create Content with AI',
     metaDescription:
       'Discover the best AI writing generators of 2025. From blog posts to product descriptions, these AI tools help you write faster, smarter, and better. Compare free and premium tools at AI Tools Cover.',
     focusKeywords: [
@@ -2994,8 +2949,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI tools for text rewriting and paraphrasing to improve clarity and avoid plagiarism',
     color: 'text-orange-600',
-    metaTitle:
-      'Top AI Paraphrasing Tools (2025) – Rephrase Smarter, Faster & Clearer',
+    metaTitle: 'Top AI Paraphrasing Tools (2025) – Rephrase Smarter, Faster & Clearer',
     metaDescription:
       'Discover the best AI-powered paraphrasing tools of 2025 to rewrite text, improve clarity, and avoid plagiarism. Explore free and paid options on AI Tools Cover.',
     focusKeywords: [
@@ -3189,8 +3143,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'copywriting',
     title: 'Copywriting',
     image: '/category_asset/copywriting.jpg',
-    description:
-      'AI-powered copywriting tools for marketing and sales content creation',
+    description: 'AI-powered copywriting tools for marketing and sales content creation',
     color: 'text-red-600',
     metaTitle: 'Elevate Your Brand Voice: AI Copywriting Assistants for 2025',
     metaDescription:
@@ -3285,8 +3238,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'summarizer',
     title: 'Summarizer',
     image: '/category_asset/summarizer.jpg',
-    description:
-      'AI tools for text summarization and content condensing from long-form content',
+    description: 'AI tools for text summarization and content condensing from long-form content',
     color: 'text-teal-600',
     metaTitle: 'Trim the Noise: Best AI Summarizer Tools for 2025',
     metaDescription:
@@ -3390,8 +3342,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered design generation tools for creating logos, layouts, banners, and visual content automatically',
     color: 'text-pink-600',
-    metaTitle:
-      'Best AI Design Generators in 2025 – From Idea to Design Instantly',
+    metaTitle: 'Best AI Design Generators in 2025 – From Idea to Design Instantly',
     metaDescription:
       'Discover the top AI-powered design generators of 2025 to create logos, layouts, banners, and visuals at scale. Explore free and paid tools for fast, beautiful designs on AI Tools Cover.',
     focusKeywords: [
@@ -3493,8 +3444,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-powered image creation tools for generating art, illustrations, and visuals from text prompts',
     color: 'text-violet-600',
-    metaTitle:
-      'AI Image Generators You Need in 2025 – Turn Prompts Into Stunning Visuals',
+    metaTitle: 'AI Image Generators You Need in 2025 – Turn Prompts Into Stunning Visuals',
     metaDescription:
       'Explore the most powerful AI image generation tools of 2025 that convert your ideas into stunning images, art, and graphics in seconds. Discover text-to-image tools, avatars, and more on AI Tools Cover.',
     focusKeywords: [
@@ -3564,8 +3514,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     howToChoose: [
       {
         criterion: 'Style compatibility',
-        description:
-          'model suited for your style (realistic, fantasy, cartoon)',
+        description: 'model suited for your style (realistic, fantasy, cartoon)',
         icon: '🧠',
       },
       {
@@ -3597,8 +3546,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     description:
       'AI-enhanced image editing tools for photo retouching, background removal, and visual enhancement',
     color: 'text-blue-600',
-    metaTitle:
-      'AI Image Editing Tools (2025) – Retouch, Enhance & Transform Photos Instantly',
+    metaTitle: 'AI Image Editing Tools (2025) – Retouch, Enhance & Transform Photos Instantly',
     metaDescription:
       'Explore the top AI image editing tools of 2025 to enhance, restore, and modify photos effortlessly. Retouch portraits, remove backgrounds, upscale images, and more with AI on AI Tools Cover.',
     focusKeywords: [
@@ -3669,8 +3617,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     howToChoose: [
       {
         criterion: 'Editing capabilities',
-        description:
-          'editing capabilities you need (removal, enhancement, retouch)',
+        description: 'editing capabilities you need (removal, enhancement, retouch)',
         icon: '🧠',
       },
       {
@@ -3699,11 +3646,9 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'text-to-image',
     title: 'Text to Image',
     image: '/category_asset/text-to-image.jpg',
-    description:
-      'AI tools that generate images and artwork from text descriptions and prompts',
+    description: 'AI tools that generate images and artwork from text descriptions and prompts',
     color: 'text-purple-600',
-    metaTitle:
-      'Text to Image AI Tools (2025) – Turn Prompts into Stunning Visuals',
+    metaTitle: 'Text to Image AI Tools (2025) – Turn Prompts into Stunning Visuals',
     metaDescription:
       'Discover the best AI text-to-image generators of 2025. Instantly transform your words into art, illustrations, and photorealistic images using cutting-edge AI tools. Explore free and premium options on AI Tools Cover.',
     focusKeywords: [
@@ -3777,8 +3722,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
       },
       {
         criterion: 'Usage rights',
-        description:
-          'image rights and licensing clearly defined for commercial use',
+        description: 'image rights and licensing clearly defined for commercial use',
         icon: '💡',
       },
       {
@@ -4243,8 +4187,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     id: 'logo-generator',
     title: 'Logo Generator',
     image: '/category_asset/logo-generator.jpg',
-    description:
-      'AI-powered logo creation tools for brand identity and professional design',
+    description: 'AI-powered logo creation tools for brand identity and professional design',
     color: 'text-green-600',
     metaTitle: 'Brand with AI: Logo Generator Tools That Impress in 2025',
     metaDescription:
@@ -5330,24 +5273,23 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
       },
     ],
   },
-
-];
+]
 
 export interface AIToolCategory {
-  id: string;
-  title: string;
-  image: string;
-  description: string;
-  features: string[];
-  color: string;
-  detailedDescription?: string;
-  keyFeatures?: string[];
-  targetUsers?: string[];
-  useCases?: string[];
-  selectionCriteria?: string[];
-  metaTitle?: string;
-  metaDescription?: string;
-  focusKeywords?: string[];
+  id: string
+  title: string
+  image: string
+  description: string
+  features: string[]
+  color: string
+  detailedDescription?: string
+  keyFeatures?: string[]
+  targetUsers?: string[]
+  useCases?: string[]
+  selectionCriteria?: string[]
+  metaTitle?: string
+  metaDescription?: string
+  focusKeywords?: string[]
 }
 
 export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
@@ -5478,8 +5420,7 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
       'Task automation scope',
       'Scalability for team growth',
     ],
-    metaTitle:
-      'AI Business Tools for 2025 – Streamline, Automate, Grow Smarter',
+    metaTitle: 'AI Business Tools for 2025 – Streamline, Automate, Grow Smarter',
     metaDescription:
       'Explore the best AI tools for business in 2025. From automation and analytics to CRM and decision-making, discover powerful AI solutions designed to grow your business. Find top-rated solutions now on AI Tools Cover.',
     focusKeywords: [
@@ -5500,12 +5441,7 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
     image: '/category_asset/video-tool.PNG',
     description:
       'AI video tools are software platforms that use artificial intelligence to assist or automate parts of the video creation process. These tools help you generate, edit, enhance, or personalize video content with minimal technical skills or manual effort.',
-    features: [
-      'Video enhancer',
-      'Video editing',
-      'Video generators',
-      'Text to video',
-    ],
+    features: ['Video enhancer', 'Video editing', 'Video generators', 'Text to video'],
     color: 'text-green-600',
     detailedDescription:
       'Unlock the power of artificial intelligence to create stunning, professional-quality videos faster than ever. Whether you are a YouTuber, marketer, educator, or business owner, the new generation of AI video tools makes content creation easier, faster, and smarter. At AI Tools Cover, we’ve curated a comprehensive list of the most powerful, creative, and intuitive AI video tools for every use case—from text-to-video generators and AI avatars to real-time video editing and voice sync.',
@@ -5606,8 +5542,7 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
       'Does it support exporting and platform integrations?',
       'Are there built-in SEO tools or analytics?',
     ],
-    metaTitle:
-      'Top AI Text Generator Tools (2025) – Write Smarter & Faster with AI',
+    metaTitle: 'Top AI Text Generator Tools (2025) – Write Smarter & Faster with AI',
     metaDescription:
       'Discover the best AI text generator tools of 2025 to create blogs, ads, emails, stories, and social content faster. Compare GPT-powered tools for writers, marketers & creators on AI Tools Cover.',
     focusKeywords: [
@@ -5621,62 +5556,60 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
     ],
   },
   {
-    id: "image-tools",
-    title: "AI Image Tools",
-    image: "/category_asset/image-tool.PNG",
-    description: "AI image tools are applications powered by machine learning and deep learning that assist with generating, modifying, or enhancing images using advanced technologies like GANs and Stable Diffusion.",
-    features: [
-      "Design generators",
-      "Image generators",
-      "Image editing",
-      "Text to image"
-    ],
-    color: "text-indigo-600",
-    detailedDescription: "Want to turn words into art, enhance pictures automatically, or design visuals at scale? AI image tools are transforming how creators, marketers, designers, and developers work with visual media. With just a few clicks or a simple text prompt, you can now generate high-quality images, remove backgrounds, edit styles, upscale low-resolution images, and even create illustrations from scratch. AI Tools Cover brings you the most powerful, up-to-date AI tools for image generation, enhancement, and editing—all in one place.",
+    id: 'image-tools',
+    title: 'AI Image Tools',
+    image: '/category_asset/image-tool.PNG',
+    description:
+      'AI image tools are applications powered by machine learning and deep learning that assist with generating, modifying, or enhancing images using advanced technologies like GANs and Stable Diffusion.',
+    features: ['Design generators', 'Image generators', 'Image editing', 'Text to image'],
+    color: 'text-indigo-600',
+    detailedDescription:
+      'Want to turn words into art, enhance pictures automatically, or design visuals at scale? AI image tools are transforming how creators, marketers, designers, and developers work with visual media. With just a few clicks or a simple text prompt, you can now generate high-quality images, remove backgrounds, edit styles, upscale low-resolution images, and even create illustrations from scratch. AI Tools Cover brings you the most powerful, up-to-date AI tools for image generation, enhancement, and editing—all in one place.',
     keyFeatures: [
-      "Text-to-Image Generation (from simple or complex prompts)",
-      "Image-to-Image Translation (turn sketches into colored art)",
-      "AI-based Style Transfer (Picasso-style, anime, oil painting, etc.)",
-      "Image Upscaling and Restoration (Super resolution)",
-      "Background removal or inpainting",
-      "Face swap, morphing, or enhancement",
-      "Avatar and logo generation",
-      "Integration with design tools like Canva, Photoshop, Figma"
+      'Text-to-Image Generation (from simple or complex prompts)',
+      'Image-to-Image Translation (turn sketches into colored art)',
+      'AI-based Style Transfer (Picasso-style, anime, oil painting, etc.)',
+      'Image Upscaling and Restoration (Super resolution)',
+      'Background removal or inpainting',
+      'Face swap, morphing, or enhancement',
+      'Avatar and logo generation',
+      'Integration with design tools like Canva, Photoshop, Figma',
     ],
     targetUsers: [
-      "Designers & digital artists creating visuals from scratch",
-      "Marketers generating ad creatives or social visuals",
-      "Bloggers & content creators producing thumbnails and graphics",
-      "E-commerce sellers enhancing product images",
-      "Educators and presenters looking for unique visual material",
-      "Developers & game designers creating environments and assets"
+      'Designers & digital artists creating visuals from scratch',
+      'Marketers generating ad creatives or social visuals',
+      'Bloggers & content creators producing thumbnails and graphics',
+      'E-commerce sellers enhancing product images',
+      'Educators and presenters looking for unique visual material',
+      'Developers & game designers creating environments and assets',
     ],
     useCases: [
-      "Generate images from text prompts (Text-to-Image)",
-      "Stylize or modify images (filters, art styles, backgrounds)",
-      "Automatically enhance, upscale, or restore low-res photos",
-      "Remove image backgrounds or unwanted elements",
-      "Create avatars, logos, and digital portraits from selfies",
-      "Convert sketches into digital illustrations or 3D renders"
+      'Generate images from text prompts (Text-to-Image)',
+      'Stylize or modify images (filters, art styles, backgrounds)',
+      'Automatically enhance, upscale, or restore low-res photos',
+      'Remove image backgrounds or unwanted elements',
+      'Create avatars, logos, and digital portraits from selfies',
+      'Convert sketches into digital illustrations or 3D renders',
     ],
     selectionCriteria: [
-      "Does it support your use case—creative, product, avatar, or art?",
-      "Is prompt input flexible (simple or structured)?",
-      "Are style & resolution customizable?",
-      "Is there a free version or pricing per generation?",
-      "Can you upload and edit existing images?"
+      'Does it support your use case—creative, product, avatar, or art?',
+      'Is prompt input flexible (simple or structured)?',
+      'Are style & resolution customizable?',
+      'Is there a free version or pricing per generation?',
+      'Can you upload and edit existing images?',
     ],
     metaTitle: "AI Image Tools You Shouldn't Miss in 2025 – Generate, Edit & Create Visually",
-    metaDescription: "Explore top AI image tools in 2025 to generate, edit, and enhance images with ease. From text-to-image generators to photo editors, discover tools that turn prompts into professional visuals—only on AI Tools Cover.",
+    metaDescription:
+      'Explore top AI image tools in 2025 to generate, edit, and enhance images with ease. From text-to-image generators to photo editors, discover tools that turn prompts into professional visuals—only on AI Tools Cover.',
     focusKeywords: [
-      "AI image tools",
-      "text to image",
-      "AI image generators",
-      "AI photo editors",
-      "image enhancement AI",
-      "image creation tools",
-      "image editing with AI",
-      "generative AI art"
+      'AI image tools',
+      'text to image',
+      'AI image generators',
+      'AI photo editors',
+      'image enhancement AI',
+      'image creation tools',
+      'image editing with AI',
+      'generative AI art',
     ],
   },
   {
@@ -5881,7 +5814,7 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
       'AI dev tools',
     ],
   },
-];
+]
 
 export const featuredProducts = [
   {
@@ -5896,7 +5829,7 @@ export const featuredProducts = [
     link: 'https://submitaitools.org/',
     category: 'Productivity',
     click_count: 0,
-    overview:'hello',
+    overview: 'hello',
     views: 0,
   },
   {
@@ -5910,7 +5843,7 @@ export const featuredProducts = [
     tagIcon: '/star.svg',
     link: 'https://www.heygen.com/',
     category: 'Productivity',
-        overview:'hello',
+    overview: 'hello',
 
     views: 0,
     click_count: 0,
@@ -5920,7 +5853,7 @@ export const featuredProducts = [
     name: 'Synthesia',
     logo: '/synthesia.png',
     image: '/featureproduct3.png',
-        overview:'hello',
+    overview: 'hello',
 
     description:
       'Synthesia is an AI video communications platform that allows users to create professional-quality videos from text.',
@@ -5931,10 +5864,10 @@ export const featuredProducts = [
     views: 0,
     click_count: 0,
   },
-];
+]
 
 export async function getFeaturedProducts() {
-  return featuredProducts;
+  return featuredProducts
 }
 
 export const similarTools = [
@@ -5957,8 +5890,7 @@ export const similarTools = [
     name: 'Buildin AI',
     logo: '/bulldln.png',
     image: '/tool2.png',
-    description:
-      'OpusClip simplifies video editing with automated clipping and creative tools.',
+    description: 'OpusClip simplifies video editing with automated clipping and creative tools.',
     tag: 'Productivity',
     tagIcon: '/star.svg',
   },
@@ -5966,12 +5898,11 @@ export const similarTools = [
     name: 'AlgoDocs',
     logo: '/algodocs.png',
     image: '/tool3.png',
-    description:
-      'RunwayML offers generative video editing tools powered by AI for creators.',
+    description: 'RunwayML offers generative video editing tools powered by AI for creators.',
     tag: 'Content Creation',
     tagIcon: '/star.svg',
   },
-];
+]
 
 export const featuredTools = [
   {
@@ -5981,4 +5912,4 @@ export const featuredTools = [
   },
   { name: 'Heygen', logo: '/heygen.jpeg', link: 'https://www.heygen.com/' },
   { name: 'Synthesia', logo: '/synth.jpeg', link: 'https://www.synthesia.io/' },
-];
+]

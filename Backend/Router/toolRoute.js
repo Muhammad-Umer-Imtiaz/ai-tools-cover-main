@@ -7,8 +7,10 @@ import {
   AddTool,
   addTool,
   categoryPagination,
+  FeaturedTools,
   findToolByUser,
   getAllTools,
+  getSingleTool,
   pagination,
   Search,
   submitTool,
@@ -51,12 +53,14 @@ const upload = multer({ storage });
 router.post("/add", upload.single("file"), addTool);
 router.get("/get-all-tools", getAllTools);
 router.post("/addtool", isAuthenticated, AddTool);
+router.get("/getsingletool/:slug", getSingleTool);
+router.get("/featuredtools",FeaturedTools)
 router.post("/submit/:id", isAuthenticated, submitTool);
 router.get("/tool-by-user", isAuthenticated, findToolByUser);
 router.get("/search", Search);
 router.get("/pagination", pagination);
 router.get("/category", categoryPagination);
 router.get("/suggestions", suggestions);
-router.get("/toolfeature",toolFeature)
+router.get("/toolfeature", toolFeature);
 
 export default router;

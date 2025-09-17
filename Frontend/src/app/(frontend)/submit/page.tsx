@@ -1,48 +1,71 @@
-"use client";
-import { useState } from "react";
+'use client'
+import { useState } from 'react'
 
 const SubmitToolForm = () => {
-  const [name, setName] = useState('');
-  const [link, setLink] = useState('');
-  const [image_url, setimage_url] = useState('');
-  const [thumbnail_url, setthumbnail_url] = useState('');
-  const [category, setCategory] = useState('');
-  const [overview, setoverview] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [name, setName] = useState('')
+  const [link, setLink] = useState('')
+  const [image_url, setimage_url] = useState('')
+  const [thumbnail_url, setthumbnail_url] = useState('')
+  const [category, setCategory] = useState('')
+  const [overview, setoverview] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   const categories = [
-    'Business & Productivity',
-    'Education & Knowledge',
-    'Environmental',
-    'Food & Nutrition',
-    'Government & Public Sector',
-    'Health & Wellness',
-    'Language & Communication',
-    'Media & Entertainment',
-    'NFT & Blockchain',
-    'Personal & Lifestyle',
-    'Security & Privacy',
-    'Sports',
-    'Tech & Engineering',
-    'Travel & Navigation',
-    'Utilities & Tools',
-    'Other',
-  ];
+    'translators',
+    'presentations',
+    'video-enhancer',
+    'video-editing',
+    'video-generators',
+    'text-to-video',
+    'prompt-generators',
+    'writing-generators',
+    'paraphrasing',
+    'storyteller',
+    'copywriting-assistant',
+    'website-builders',
+    'marketing',
+    'finance',
+    'project-management',
+    'social-media',
+    'design-generators',
+    'image-generators',
+    'image-editing',
+    'text-to-image',
+    'workflows',
+    'ai-agents',
+    'cartoon-generators',
+    'portrait-generators',
+    'avatar-generator',
+    'logo-generator',
+    '3D-generator',
+    'audio-editing',
+    'text-to-speech',
+    'music-generator',
+    'transcriber',
+    'fitness',
+    'religion',
+    'students',
+    'fashion-assistant',
+    'gift-ideas',
+    'code-assistant',
+    'no-code',
+    'sql-assistant',
+  ]
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault()
 
     // Validation
     if (!name || !link || !image_url || !category || !overview || !thumbnail_url) {
-      setErrorMessage("Please fill in all required fields.");
-      setIsErrorModalOpen(true);
-      return;
+      setErrorMessage('Please fill in all required fields.')
+      setIsErrorModalOpen(true)
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     const requestBody = {
       name: name.trim(),
@@ -50,57 +73,56 @@ const SubmitToolForm = () => {
       image_url: image_url.trim(),
       thumbnail_url: thumbnail_url.trim(),
       category: category,
-      overview: overview.trim()
-    };
+      overview: overview.trim(),
+    }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/addtool`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "authorization": `Bearer ${token}`
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(requestBody),
-                credentials: 'include'
-
-      });
+        credentials: 'include',
+      })
 
       if (response.ok) {
-        setIsSuccessModalOpen(true);
+        setIsSuccessModalOpen(true)
         // Reset form
-        setName('');
-        setLink('');
-        setimage_url('');
-        setthumbnail_url('');
-        setCategory('');
-        setoverview('');
+        setName('')
+        setLink('')
+        setimage_url('')
+        setthumbnail_url('')
+        setCategory('')
+        setoverview('')
       } else {
-        handleSubmitForRegularSignupUsers({ preventDefault: () => {} });
+        handleSubmitForRegularSignupUsers({ preventDefault: () => {} })
         // const error = await response.json();
         // setErrorMessage(error.message || `Submission failed with status: ${response.status}`);
         // setIsErrorModalOpen(true);
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      setErrorMessage("Network error. Please check your connection and try again.");
-      setIsErrorModalOpen(true);
+      console.error('Error submitting form:', error)
+      setErrorMessage('Network error. Please check your connection and try again.')
+      setIsErrorModalOpen(true)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
-  const handleSubmitForRegularSignupUsers = async (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
+  const handleSubmitForRegularSignupUsers = async (e: { preventDefault: () => void }) => {
+    e.preventDefault()
 
     // Validation
     if (!name || !link || !image_url || !category || !overview || !thumbnail_url) {
-      setErrorMessage("Please fill in all required fields.");
-      setIsErrorModalOpen(true);
-      return;
+      setErrorMessage('Please fill in all required fields.')
+      setIsErrorModalOpen(true)
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     const requestBody = {
       name: name.trim(),
@@ -108,51 +130,51 @@ const SubmitToolForm = () => {
       image_url: image_url.trim(),
       thumbnail_url: thumbnail_url.trim(),
       category: category,
-      overview: overview.trim()
-    };
+      overview: overview.trim(),
+    }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch("/api/tools/submit/", {
-        method: "POST",
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/tools/submit/', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "authorization": `Token ${token}`
+          'Content-Type': 'application/json',
+          authorization: `Token ${token}`,
         },
         body: JSON.stringify(requestBody),
-      });
+      })
 
       if (response.ok) {
-        setIsSuccessModalOpen(true);
+        setIsSuccessModalOpen(true)
         // Reset form
-        setName('');
-        setLink('');
-        setimage_url('');
-        setthumbnail_url('');
-        setCategory('');
-        setoverview('');
+        setName('')
+        setLink('')
+        setimage_url('')
+        setthumbnail_url('')
+        setCategory('')
+        setoverview('')
       } else {
-        const error = await response.json();
-        setErrorMessage(error.message || `Submission failed with status: ${response.status}`);
-        setIsErrorModalOpen(true);
+        const error = await response.json()
+        setErrorMessage(error.message || `Submission failed with status: ${response.status}`)
+        setIsErrorModalOpen(true)
       }
     } catch (error) {
-      console.error("Error submitting form:", error);
-      setErrorMessage("Network error. Please check your connection and try again.");
-      setIsErrorModalOpen(true);
+      console.error('Error submitting form:', error)
+      setErrorMessage('Network error. Please check your connection and try again.')
+      setIsErrorModalOpen(true)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const closeSuccessModal = () => {
-    setIsSuccessModalOpen(false);
-  };
+    setIsSuccessModalOpen(false)
+  }
 
   const closeErrorModal = () => {
-    setIsErrorModalOpen(false);
-    setErrorMessage('');
-  };
+    setIsErrorModalOpen(false)
+    setErrorMessage('')
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 py-12 px-4">
@@ -214,15 +236,15 @@ const SubmitToolForm = () => {
           {image_url && (
             <div className="mt-3 p-3 bg-gray-50 rounded-xl">
               <p className="text-sm text-gray-600 mb-2">Image Preview:</p>
-              <img 
-                src={image_url} 
-                alt="Tool preview" 
+              <img
+                src={image_url}
+                alt="Tool preview"
                 className="w-16 h-16 object-cover rounded-lg border"
                 onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const errorDiv = target.nextElementSibling as HTMLElement;
-                  target.style.display = 'none';
-                  if (errorDiv) errorDiv.style.display = 'block';
+                  const target = e.target as HTMLImageElement
+                  const errorDiv = target.nextElementSibling as HTMLElement
+                  target.style.display = 'none'
+                  if (errorDiv) errorDiv.style.display = 'block'
                 }}
               />
               <div className="hidden text-sm text-red-500">Invalid image URL</div>
@@ -247,15 +269,15 @@ const SubmitToolForm = () => {
           {thumbnail_url && (
             <div className="mt-3 p-3 bg-gray-50 rounded-xl">
               <p className="text-sm text-gray-600 mb-2">Thumbnail Preview:</p>
-              <img 
-                src={thumbnail_url} 
-                alt="Tool preview" 
+              <img
+                src={thumbnail_url}
+                alt="Tool preview"
                 className="w-16 h-16 object-cover rounded-lg border"
                 onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  const errorDiv = target.nextElementSibling as HTMLElement;
-                  target.style.display = 'none';
-                  if (errorDiv) errorDiv.style.display = 'block';
+                  const target = e.target as HTMLImageElement
+                  const errorDiv = target.nextElementSibling as HTMLElement
+                  target.style.display = 'none'
+                  if (errorDiv) errorDiv.style.display = 'block'
                 }}
               />
               <div className="hidden text-sm text-red-500">Invalid thumbnail URL</div>
@@ -278,7 +300,9 @@ const SubmitToolForm = () => {
           >
             <option value="">Select a category</option>
             {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
             ))}
           </select>
         </div>
@@ -298,9 +322,7 @@ const SubmitToolForm = () => {
             required
             disabled={isLoading}
           />
-          <div className="text-right text-sm text-gray-500">
-            {overview.length}/500 characters
-          </div>
+          <div className="text-right text-sm text-gray-500">{overview.length}/500 characters</div>
         </div>
 
         {/* Submit Button */}
@@ -318,7 +340,12 @@ const SubmitToolForm = () => {
             <>
               <span>Submit Tool</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
               </svg>
             </>
           )}
@@ -330,12 +357,25 @@ const SubmitToolForm = () => {
         <div className="fixed bottom-4 right-4 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center transform">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-8 h-8 text-green-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <h3 className="text-2xl font-bold text-green-600 mb-3">Success!</h3>
-            <p className="text-gray-700 mb-6">Your AI tool has been submitted successfully. Thank you for contributing to our community!</p>
+            <p className="text-gray-700 mb-6">
+              Your AI tool has been submitted successfully. Thank you for contributing to our
+              community!
+            </p>
             <button
               onClick={closeSuccessModal}
               className="bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-8 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-green-300"
@@ -351,8 +391,18 @@ const SubmitToolForm = () => {
         <div className="fixed bottom-4 right-4 flex justify-center items-center z-50 p-4">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center transform">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-8 h-8 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </div>
             <h3 className="text-2xl font-bold text-red-600 mb-3">Oops!</h3>
@@ -367,7 +417,7 @@ const SubmitToolForm = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default SubmitToolForm;
+export default SubmitToolForm
