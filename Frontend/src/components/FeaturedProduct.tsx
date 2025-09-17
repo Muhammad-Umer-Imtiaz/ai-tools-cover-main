@@ -39,66 +39,97 @@ const FeaturedProduct: React.FC = () => {
 
     fetchFeaturedTools()
   }, [])
+  const createSlug = (name: string): string => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+  }
 
   if (loading) {
     return (
       <main className="px-4 md:px-16">
-        <h1 className="font-bold text-4xl mb-10 px-4 text-black">Featured Tools</h1>
+        <h1 className="font-bold text-4xl mt-14 mb-10 px-4 text-black">Featured Tools</h1>
         <p className="px-4">Loading...</p>
       </main>
     )
   }
 
   return (
-    <main className="px-4 md:px-16">
-      <h1 className="font-bold text-4xl mb-10 px-4 text-black">Featured Tools</h1>
-      <section className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-        {tools.map((product) => (
-          <Link key={product._id} href={`/products/${product._id}`}>
-            <article
-              className="w-full max-w-sm h-[500px] border rounded-3xl mx-auto transition-all"
-              style={{
-                borderColor: '#cbd7ea',
-                boxShadow: '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 2px 2px 9px 0 #290058'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d'
-              }}
-            >
-              <Image
-                src={product.thumbnail_url}
-                alt={`Featured product: ${product.name}`}
-                width={410}
-                height={240}
-                className="rounded-t-3xl"
-              />
-              <div className="flex justify-between px-4 mt-5">
-                <div className="flex items-center gap-2">
-                  <Image
-                    src={product.image_url}
-                    alt={`${product.name} logo`}
-                    width={50}
-                    height={50}
-                    className="rounded-full"
-                  />
-                  <h3 className="font-bold text-black">{product.name}</h3>
+    <main className="">
+      <h1 className="font-bold text-4xl mt-14 mb-10 px-4 text-black">Featured Tools</h1>
+      <section className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8 px-2 sm:px-0">
+        {tools.map((tool) => (
+          <Link key={tool._id} href={`/tool/${createSlug(tool.name)}`}>
+            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-4 sm:p-6 border border-gray-100 group hover:-translate-y-1 w-full max-w-sm mx-auto h-[280px] sm:h-[320px] lg:h-[340px] flex flex-col">
+              {/* Tool Header */}
+              <div className="flex items-start justify-between mb-2 sm:mb-3 lg:mb-4 flex-shrink-0">
+                <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-[#7d42fb]/10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <Image
+                      src={tool.image_url}
+                      alt={tool.name}
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-xs sm:text-sm lg:text-base xl:text-lg text-gray-900 group-hover:text-[#7d42fb] transition-colors truncate">
+                      {tool.name}
+                    </h3>
+                  </div>
                 </div>
-                <span className="text-[#7d42fb] mt-3">
-                  <FiExternalLink size={28} />
-                </span>
               </div>
-              <p className="px-4 mt-5 text-[#46526a] font-semibold line-clamp-4">
-                {product.overview}
-              </p>
-              <div className="flex gap-3 mt-5 px-4 items-center">
-                <span className="bg-[#ecf2ff] px-5 py-1 rounded-full text-sm">
-                  {product.category}
-                </span>
+
+              {/* Tool Description */}
+              <div className="flex-1 flex flex-col min-h-0">
+                <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 lg:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed flex-shrink-0">
+                  {tool.overview}
+                </p>
+
+                {/* Tool Tags */}
+                <div className="flex flex-wrap gap-1 mb-3 sm:mb-4 flex-shrink-0">
+                  {tool.tags
+                    ?.split('#') // split on "#"
+                    .filter((tag) => tag.trim() !== '') // remove empties
+                    .map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-[#7d42fb]/10 text-[#7d42fb] text-xs rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                </div>
+
+                {/* Pricing */}
+                {tool.pricing && (
+                  <div className="mb-2 sm:mb-3 lg:mb-4 flex-shrink-0">
+                    <span className="px-2 sm:px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      {tool.pricing}
+                    </span>
+                  </div>
+                )}
+
+                {/* Spacer */}
+                <div className="flex-1"></div>
+
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-2 sm:pt-3 lg:pt-4 border-t border-gray-100 flex-shrink-0 mt-auto">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      window.open(tool.link, '_blank', 'noopener,noreferrer')
+                    }}
+                    className="flex items-center gap-1 sm:gap-2 text-[#7d42fb] font-medium hover:text-[#6b35e0] transition-colors text-xs sm:text-sm"
+                  >
+                    Try Now <FiExternalLink size={12} />
+                  </button>
+                </div>
               </div>
-            </article>
+            </div>
           </Link>
         ))}
       </section>

@@ -177,7 +177,6 @@ export const FeaturedTools = async (req, res) => {
   }
 };
 
-
 export const findToolByUser = async (req, res) => {
   try {
     const id = req.user._id;
@@ -383,5 +382,38 @@ export const toolFeature = async (req, res) => {
       message: "Internal Server Error",
       error: error.message,
     });
+  }
+};
+
+export const aiToolsFeatures = async (req, res) => {
+  try {
+    let features = req.query.q; // comes as string
+
+    // Parse into array if it's JSON string
+    if (typeof features === "string") {
+      try {
+        features = JSON.parse(features);
+      } catch (err) {
+        return res.status(400).json({ error: "Invalid features array format" });
+      }
+    }
+
+    console.log("Features are: ", features);
+
+    if (!features || !Array.isArray(features)) {
+      return res.status(400).json({ error: "features array required" });
+    }
+
+    const results = {};
+
+    for (const category of features) {
+      const tools = await Tool.find({ category }).limit(6).lean();
+      results[category] = tools;
+    }
+
+    res.json({ success: true, data: results });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 };

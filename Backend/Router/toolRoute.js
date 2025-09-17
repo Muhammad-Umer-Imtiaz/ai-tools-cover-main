@@ -6,6 +6,7 @@ import path from "path";
 import {
   AddTool,
   addTool,
+  aiToolsFeatures,
   categoryPagination,
   FeaturedTools,
   findToolByUser,
@@ -62,5 +63,6 @@ router.get("/pagination", pagination);
 router.get("/category", categoryPagination);
 router.get("/suggestions", suggestions);
 router.get("/toolfeature", toolFeature);
+router.get("/ai-tools-features",aiToolsFeatures)
 
 export default router;

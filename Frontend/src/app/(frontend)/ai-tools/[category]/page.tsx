@@ -31,7 +31,7 @@ import toast from 'react-hot-toast'
 interface Tool {
   id: number
   name: string
-  description: string
+  overview: string
   image_url?: string
   thumbnail_url: string
   category: string
@@ -42,6 +42,7 @@ interface Tool {
 
 const useFavorites = () => {
   const [favorites, setFavorites] = useState<Tool[]>([])
+  const [toolsData, setToolsData] = useState<{ [key: string]: any[] }>({})
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -166,6 +167,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
   const { isFavorite, toggleFavorite } = useFavorites()
   const itemsPerPage = 3
   const totalPages = Math.ceil(tools.length / itemsPerPage)
+  console.log('Tools is', tools)
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % totalPages)
@@ -195,7 +197,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
           name: product.name,
           thumbnail: product.thumbnail_url,
           logo: product.image_url,
-          description: product.description,
+          overview: product.overview,
           tag: product.category,
           tagIcon: '',
           link: product.link,
@@ -248,7 +250,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
           {getCurrentTools().map((tool) => (
             <Link
               key={tool.id}
-              href={`/ai-tools/${createToolSlug(tool.name)}`}
+              href={`/tool/${createToolSlug(tool.name)}`}
               onClick={() => storeProductData(tool)}
             >
               <div
@@ -310,7 +312,7 @@ const ToolsSlider: React.FC<ToolsSliderProps> = ({ tools, featureName }) => {
                 </div>
 
                 <p className="text-gray-600 text-sm mb-4 overflow-hidden text-ellipsis line-clamp-4 max-h-[4.5em]">
-                  {tool.description}
+                  {tool.overview}
                 </p>
 
                 {/* Tool Stats */}
@@ -492,26 +494,59 @@ const AICategoryGuide = ({ categoryData }: { categoryData: any }) => {
 const CategoryPage = () => {
   const router = useRouter()
   const pathname = usePathname()
+  const [toolsData, setToolsData] = useState<{ [key: string]: any[] }>({})
   const [selectedFeature, setSelectedFeature] = useState<string | null>(null)
   const [categoryData, setCategoryData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get category from URL
     const path = window.location.pathname
     const categorySlug = path.split('/ai-tools/')[1]
 
+    let features: string[] = []
+
     if (categorySlug) {
-      // Find matching category from AI_TOOLS_CATEGORIES
       const matchedCategory = AI_TOOLS_CATEGORIES.find(
         (cat) => cat.id.toLowerCase().replace(/\s+/g, '-') === categorySlug,
       )
 
+      console.log('Matched Category is ', matchedCategory)
+
       if (matchedCategory) {
         setCategoryData(matchedCategory)
+
+        // ✅ Convert features to slug format (db style)
+        features = matchedCategory.features.map((f: string) => f.toLowerCase().replace(/\s+/g, '-'))
+
+        console.log('Normalized Features:', features)
       }
     }
-    setLoading(false)
+
+    const fetchData = async () => {
+      try {
+        if (features.length === 0) return
+
+        const query = encodeURIComponent(JSON.stringify(features))
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/ai-tools-features?q=${query}`,
+        )
+
+        if (!res.ok) {
+          console.error('Issue calling API')
+          return
+        }
+
+        const result = await res.json()
+        console.log('API Result:', result)
+        setToolsData(result.data)
+      } catch (error) {
+        console.error('Fetch error:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -530,85 +565,11 @@ const CategoryPage = () => {
       setSelectedFeature(null)
     }
   }, [pathname, categoryData])
-
+  // const features =
   const handleFeatureClick = (feature: string) => {
     const featureSlug = feature.toLowerCase().replace(/[^a-z0-9]+/g, '-')
     router.push(`/ai-tools/features/${featureSlug}`)
-  }
-
-  // Generate dummy tools for each feature (increased to 6 for better slider demo)
-  const generateDummyTools = (feature: string): Tool[] => {
-    const baseTools = [
-      {
-        id: Math.random() * 1000,
-        name: `${feature} Pro`,
-        description: `Advanced ${feature.toLowerCase()} tool with AI-powered capabilities. Perfect for professionals and teams looking to enhance their workflow.`,
-        image_url: '/ai_logo.png',
-        thumbnail_url: '/api/placeholder/300/200',
-        category: categoryData?.title || 'AI Tool',
-        click_count: Math.floor(Math.random() * 500) + 50,
-        link: `https://example.com/${feature.toLowerCase().replace(/\s+/g, '-')}`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
-      },
-      {
-        id: Math.random() * 1000,
-        name: `Smart ${feature}`,
-        description: `Intelligent ${feature.toLowerCase()} solution that automates complex tasks and provides instant results with machine learning algorithms.`,
-        image_url: '/ai_logo.png',
-        thumbnail_url: '/api/placeholder/300/200',
-        category: categoryData?.title || 'AI Tool',
-        click_count: Math.floor(Math.random() * 500) + 50,
-        link: `https://example.com/smart-${feature.toLowerCase().replace(/\s+/g, '-')}`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
-      },
-      {
-        id: Math.random() * 1000,
-        name: `${feature} Assistant`,
-        description: `AI-powered ${feature.toLowerCase()} assistant that helps you create, optimize, and manage your projects efficiently.`,
-        image_url: '/ai_logo.png',
-        thumbnail_url: '/api/placeholder/300/200',
-        category: categoryData?.title || 'AI Tool',
-        click_count: Math.floor(Math.random() * 500) + 50,
-        link: `https://example.com/${feature.toLowerCase().replace(/\s+/g, '-')}-assistant`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
-      },
-      {
-        id: Math.random() * 1000,
-        name: `Ultra ${feature}`,
-        description: `Next-generation ${feature.toLowerCase()} platform with cutting-edge AI technology for maximum productivity and efficiency.`,
-        image_url: '/ai_logo.png',
-        thumbnail_url: '/api/placeholder/300/200',
-        category: categoryData?.title || 'AI Tool',
-        click_count: Math.floor(Math.random() * 500) + 50,
-        link: `https://example.com/ultra-${feature.toLowerCase().replace(/\s+/g, '-')}`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
-      },
-      {
-        id: Math.random() * 1000,
-        name: `${feature} Master`,
-        description: `Professional-grade ${feature.toLowerCase()} solution designed for enterprises and power users who demand excellence.`,
-        image_url: '/ai_logo.png',
-        thumbnail_url: '/api/placeholder/300/200',
-        category: categoryData?.title || 'AI Tool',
-        click_count: Math.floor(Math.random() * 500) + 50,
-        link: `https://example.com/${feature.toLowerCase().replace(/\s+/g, '-')}-master`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
-      },
-      {
-        id: Math.random() * 1000,
-        name: `AI ${feature} Hub`,
-        description: `Comprehensive ${feature.toLowerCase()} ecosystem that combines multiple AI tools in one powerful, user-friendly platform.`,
-        image_url: '/ai_logo.png',
-        thumbnail_url: '/api/placeholder/300/200',
-        category: categoryData?.title || 'AI Tool',
-        click_count: Math.floor(Math.random() * 500) + 50,
-        link: `https://example.com/ai-${feature.toLowerCase().replace(/\s+/g, '-')}-hub`,
-        views: `${(Math.random() * 5 + 1).toFixed(1)}k`,
-      },
-    ]
-
-    return baseTools.slice(0, 6) // Return 6 tools for better slider demo
-  }
+  }  
 
   const createFeatureSlug = (feature: string): string => {
     return feature
@@ -718,7 +679,7 @@ const CategoryPage = () => {
                 {/* Tools Slider - Show only if this feature is selected or no feature is selected */}
                 {(!selectedFeature || selectedFeature === featureSlug) && (
                   <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                    <ToolsSlider tools={generateDummyTools(feature)} featureName={feature} />
+<ToolsSlider tools={toolsData[featureSlug] || []} featureName={feature} />
                   </div>
                 )}
               </div>
@@ -734,7 +695,6 @@ const CategoryPage = () => {
 }
 
 export default CategoryPage
-
 ;<style jsx>{`
   .line-clamp-4 {
     display: -webkit-box;

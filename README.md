@@ -4,9 +4,9 @@ seo
 education
 e commerce
 customer support
-hr
+human-resources
 sales assistant
-stock
+stock-trading
 legal
 teachers
 startup
