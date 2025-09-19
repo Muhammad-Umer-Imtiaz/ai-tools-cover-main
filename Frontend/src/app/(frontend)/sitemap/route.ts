@@ -2,64 +2,61 @@ import { NextResponse } from 'next/server'
 import { categories } from '@/constants'
 
 export async function GET() {
-  // ✅ Apna base URL set karo
-  // Production me NEXT_PUBLIC_BASE_URL use hoga, warna localhost
   const baseUrl = 'https://aitoolscover.com'
-
-  // ✅ Sitemap ke liye current date
   const currentDate = new Date().toISOString()
 
-  // ✅ Tools ke naam ko URL-friendly slug me convert karne ka helper function
+  // Helper to create URL-friendly slugs for tools
   const createSlug = (name: string): string =>
     name
-      .toLowerCase() // sab lowercase me
-      .replace(/[^a-z0-9]+/g, '-') // non-alphanumeric ko `-` me badalna
-      .replace(/^-+|-+$/g, '') // starting/ending `-` hata dena
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
 
-  // ✅ Categories ke liye clean slug function (e.g. "Writing & Editing" -> "writing-editing")
+  // Helper to create category slugs
   const createCategorySlug = (label: string): string =>
     label
-      .replace(/&/g, '') // ampersand remove
-      .replace(/[^\w\s-]/g, '') // special characters remove
-      .replace(/\s+/g, '-') // spaces ko `-` me convert
-      .replace(/-+/g, '-') // multiple `-` ko ek karna
-      .replace(/^-+|-+$/g, '') // start/end hyphen remove
-      .toLowerCase() // lowercase me convert
+      .replace(/&/g, '')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase()
 
-  // ✅ Categories se sitemap URLs generate karna
+  // Generate category URLs
   const categoryUrls = categories
     .map(
       (category) => `<url>
-      <loc>${baseUrl}/category/${createCategorySlug(category.label)}</loc>
-      <lastmod>${currentDate}</lastmod>
-      <changefreq>daily</changefreq>
-      <priority>0.8</priority>
-    </url>`,
+        <loc>${baseUrl}/category/${createCategorySlug(category.label)}</loc>
+        <lastmod>${currentDate}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+      </url>`,
     )
     .join('')
 
-  // ✅ Tools ke URLs yaha store honge
   let toolsUrls = ''
 
   try {
     console.log('Fetching all tools for sitemap...')
 
-    // ✅ Backend API se tools fetch karna
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/get-all-tools`)
 
     if (!res.ok) {
-      // Agar API response fail ho jaye
       console.error(`Failed to fetch tools: ${res.status}`)
     } else {
       const data = await res.json()
-      console.log(`Found ${data.total_results} tools`)
+      const allTools = data.tool || data.results || []
 
-      // ✅ API se aaye tools ko sitemap URLs me convert karna
-      const Tools = (data.tool || data.results || [])
+      if (allTools.length === 0) console.log('No tools found for sitemap')
+
+      // Filter out tools without a valid name
+      const validTools = allTools.filter(
+        (tool: { name?: string }) => tool.name && tool.name.trim() !== '',
+      )
+
+      toolsUrls = validTools
         .map((tool: { name: string; createdAt?: string | number | Date }) => {
-          // Agar tool ke paas date nahi hai to current date use karna
           const toolDate = tool.createdAt ? new Date(tool.createdAt).toISOString() : currentDate
-
           return `<url>
             <loc>${baseUrl}/tool/${createSlug(tool.name)}</loc>
             <lastmod>${toolDate}</lastmod>
@@ -69,14 +66,13 @@ export async function GET() {
         })
         .join('')
 
-      toolsUrls += Tools
+      console.log(`Found ${validTools.length} valid tools for sitemap`)
     }
   } catch (error: any) {
-    // ✅ Agar API call hi fail ho jaye
     console.error('Error fetching tools for sitemap:', error?.message || error)
   }
 
-  // ✅ Static pages ke liye URLs
+  // Static pages
   const staticUrls = [
     { path: '', priority: '1.0', changefreq: 'weekly' },
     { path: '/category', priority: '0.7', changefreq: 'weekly' },
@@ -94,15 +90,15 @@ export async function GET() {
   ]
     .map(
       ({ path, priority, changefreq }) => `<url>
-    <loc>${baseUrl}${path}</loc>
-    <lastmod>${currentDate}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-  </url>`,
+        <loc>${baseUrl}${path}</loc>
+        <lastmod>${currentDate}</lastmod>
+        <changefreq>${changefreq}</changefreq>
+        <priority>${priority}</priority>
+      </url>`,
     )
     .join('')
 
-  // ✅ Final Sitemap (static + category + tools sab combine ho gaye)
+  // Combine all URLs
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     ${staticUrls}
@@ -110,7 +106,6 @@ export async function GET() {
     ${toolsUrls}
   </urlset>`
 
-  // ✅ Response return karna with correct header
   return new NextResponse(sitemap, {
     headers: { 'Content-Type': 'application/xml' },
   })

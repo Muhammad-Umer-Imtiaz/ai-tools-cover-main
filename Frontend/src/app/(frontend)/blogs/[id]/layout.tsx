@@ -1,20 +1,20 @@
-
-
-import React from 'react'
-import Script from 'next/script'
-import { Metadata } from 'next'
+import React from 'react';
+import Script from 'next/script';
+import { Metadata } from 'next';
 
 type Props = {
-  children: React.ReactNode
-  params: { id: string; title?: string } // optional title from fetch
-}
+  children: React.ReactNode;
+  params: Promise<{ id: string }>; // Changed to Promise
+};
 
-export default function BlogLayout({ children, params }: Props) {
-  const blogId = params.id
-  const blogTitle = params.title || 'Blog Article' // fallback
-  const siteName = 'AI Tools Cover Blog'
-  const pageTitle = `${siteName} - ${blogTitle}`
-  const canonicalUrl = `https://aitoolscover.com/blogs/${blogId}`
+export default async function BlogLayout({ children, params }: Props) {
+  // Await the params promise
+  const { id: blogId } = await params;
+  
+  const blogTitle = 'Blog Article'; // fallback, title needs to be fetched or passed differently
+  const siteName = 'AI Tools Cover Blog';
+  const pageTitle = `${siteName} - ${blogTitle}`;
+  const canonicalUrl = `https://aitoolscover.com/blogs/${blogId}`;
 
   // JSON-LD structured data for SEO
   const jsonLd = {
@@ -32,7 +32,7 @@ export default function BlogLayout({ children, params }: Props) {
       '@type': 'WebPage',
       '@id': canonicalUrl,
     },
-  }
+  };
 
   return (
     <>
@@ -46,19 +46,22 @@ export default function BlogLayout({ children, params }: Props) {
         {children}
       </main>
     </>
-  )
+  );
 }
 
 // Static metadata for SEO (dynamic title using function)
 export const generateMetadata = async ({
   params,
 }: {
-  params: { id: string; title?: string }
+  params: Promise<{ id: string }>; // Changed to Promise
 }): Promise<Metadata> => {
-  const blogTitle = params.title || 'Blog Article'
-  const siteName = 'AI Tools Cover Blog'
-  const pageTitle = `${siteName} - ${blogTitle}`
-  const canonicalUrl = `https://aitoolscover.com/blogs/${params.id}`
+  // Await the params promise
+  const { id } = await params;
+  
+  const blogTitle = 'Blog Article'; // title needs to be fetched or passed differently
+  const siteName = 'AI Tools Cover Blog';
+  const pageTitle = `${siteName} - ${blogTitle}`;
+  const canonicalUrl = `https://aitoolscover.com/blogs/${id}`;
 
   return {
     title: pageTitle,
@@ -67,5 +70,5 @@ export const generateMetadata = async ({
     alternates: {
       canonical: canonicalUrl,
     },
-  }
-}
+  };
+};
