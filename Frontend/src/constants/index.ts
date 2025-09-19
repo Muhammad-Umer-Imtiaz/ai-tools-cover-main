@@ -5544,7 +5544,7 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
     ],
     metaTitle: 'Top AI Text Generator Tools (2025) – Write Smarter & Faster with AI',
     metaDescription:
-      'Discover the best AI text generator tools of 2025 to create blogs, ads, emails, stories, and social content faster. Compare GPT-powered tools for writers, marketers & creators on AI Tools Cover.',
+      'Discover top AI text generators of 2025 for blogs, ads, emails, stories & social content. Compare GPT tools for writers & marketers.',
     focusKeywords: [
       'AI text generator',
       'GPT writing tools',

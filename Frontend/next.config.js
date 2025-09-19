@@ -11,7 +11,19 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-
+  async headers() {
+    return [
+      {
+        source: '/:path*', // apply to all routes
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'index, follow', // or "noindex, nofollow"
+          },
+        ],
+      },
+    ]
+  },
   // Add Sass configuration to suppress deprecation warnings
   sassOptions: {
     silenceDeprecations: ['legacy-js-api'],

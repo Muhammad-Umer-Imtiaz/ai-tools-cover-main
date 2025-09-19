@@ -9,12 +9,15 @@ import { FaBlog, FaFire } from 'react-icons/fa'
 function useDebounce(callback: Function, delay: number) {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  return useCallback((...args: any[]) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-    timeoutRef.current = setTimeout(() => callback(...args), delay)
-  }, [callback, delay])
+  return useCallback(
+    (...args: any[]) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+      timeoutRef.current = setTimeout(() => callback(...args), delay)
+    },
+    [callback, delay],
+  )
 }
 
 export default function Page() {
@@ -276,9 +279,7 @@ export default function Page() {
                   <h2 className="text-xl font-bold mb-3 text-gray-800 group-hover:text-purple-600 transition-colors">
                     {blog.title || 'Untitled Post'}
                   </h2>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {blog.excerpt}
-                  </p>
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3">{blog.excerpt}</p>
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                     <div className="flex items-center gap-3">
                       <span className="flex items-center gap-1">
@@ -312,7 +313,9 @@ export default function Page() {
           // No blogs match search
           <div className="text-center py-16">
             <div className="text-gray-400 text-6xl mb-4">🔍</div>
-            <p className="text-gray-600 text-lg mb-2">No articles found matching "{debouncedSearchTerm}"</p>
+            <p className="text-gray-600 text-lg mb-2">
+              No articles found matching "{debouncedSearchTerm}"
+            </p>
             <p className="text-gray-500 mb-4">Try adjusting your search terms</p>
             <button
               onClick={() => {
