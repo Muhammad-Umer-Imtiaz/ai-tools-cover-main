@@ -12,11 +12,8 @@ import {
   FiCopy,
   FiCode,
   FiShare2,
-  FiEye,
-  FiMousePointer,
 } from 'react-icons/fi'
 import {
-  FaArrowLeft,
   FaFacebookF,
   FaWhatsapp,
   FaLinkedinIn,
@@ -25,7 +22,6 @@ import {
   FaStar,
   FaUser,
   FaThumbsUp,
-  FaFlag,
   FaShieldAlt,
   FaDollarSign,
   FaGift,
@@ -66,6 +62,12 @@ interface SimilarTool {
   developer: string | null
   category: string
   submitted_by: string | null
+  key_features?: string
+  benefits?: string
+  pricing_plans?: string
+  tips_best_practices?: string
+  final_take?: string
+  what_you_can_do_with?: string
 }
 
 interface SimilarToolsResponse {
@@ -97,6 +99,13 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false)
   const [showAllReviews, setShowAllReviews] = useState(false)
   const [copiedEmbed, setCopiedEmbed] = useState(false)
+
+  // Log product state when it updates
+  useEffect(() => {
+    if (product) {
+      console.log('Updated product state:', product)
+    }
+  }, [product])
 
   // Initialize dummy reviews
   useEffect(() => {
@@ -150,15 +159,15 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
 
       const standardizedTool = {
         _id: toolId, // Use _id consistently
-        name: tool.name || product.name,
-        image: tool.image || product.image || product.logo,
-        image_url: tool.image_url || product.image || product.logo,
-        thumbnail: tool.thumbnail || product.thumbnail,
-        thumbnail_url: tool.thumbnail_url || product.thumbnail,
-        overview: tool.overview || product.overview,
-        description: tool.description || product.description,
-        category: tool.category || product.tag,
-        link: tool.link || product.link,
+        name: tool.name || product?.name,
+        image: tool.image || product?.image || product?.logo,
+        image_url: tool.image_url || product?.image || product?.logo,
+        thumbnail: tool.thumbnail || product?.thumbnail,
+        thumbnail_url: tool.thumbnail_url || product?.thumbnail,
+        overview: tool.overview || product?.overview,
+        description: tool.description || product?.description,
+        category: tool.category || product?.tag,
+        link: tool.link || product?.link,
         ...tool,
       }
 
@@ -248,7 +257,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data: SimilarToolsResponse = await response.json()
+      const data = await response.json()
       console.log(data)
       setSimilarTools(data.results || [])
     } catch (error) {
@@ -308,7 +317,7 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
 
       const apiData = await response.json()
       if (apiData.success && apiData.tool) {
-        // Map API response to match SimilarTool/product shape
+        // Map API response to match SimilarTool/product shape, including detailed fields
         const tool: SimilarTool = {
           _id: apiData.tool._id || Date.now(), // Ensure _id is set
           name: apiData.tool.name,
@@ -331,6 +340,13 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
           developer: apiData.tool.developer || null,
           category: apiData.tool.category || apiData.tool.tag || 'AI Tool',
           submitted_by: apiData.tool.submitted_by || null,
+          // Map additional detailed fields if available from API
+          key_features: apiData.tool.key_features || '',
+          benefits: apiData.tool.benefits || '',
+          pricing_plans: apiData.tool.pricing_plans || '',
+          tips_best_practices: apiData.tool.tips_best_practices || '',
+          final_take: apiData.tool.final_take || '',
+          what_you_can_do_with: apiData.tool.what_you_can_do_with || '',
         }
 
         // Enhance and store in sessionStorage
@@ -426,27 +442,50 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
       }
 
       try {
+        // Iterate through sessionStorage to find the matching product
         for (let i = 0; i < sessionStorage.length; i++) {
           const key = sessionStorage.key(i)
           if (key && key.startsWith('product_')) {
-            const data = JSON.parse(sessionStorage.getItem(key) || '{}')
-            const productSlug = createSlug(data.name)
+            const rawData = sessionStorage.getItem(key)
+            if (!rawData) {
+              console.warn(`No data found for key: ${key}`)
+              continue // Skip if no data for this key
+            }
 
-            // Fixed: Use strict equality (===) instead of loose equality (==)
+            let data
+            try {
+              data = JSON.parse(rawData)
+            } catch (parseError) {
+              console.error(`Failed to parse JSON for key: ${key}`, parseError)
+              continue // Skip if JSON parsing fails
+            }
+
+            // Validate that data contains required fields
+            if (!data.name || !data._id || !data.id) {
+              console.warn(`Incomplete data for key: ${key}`, data)
+              continue // Skip if essential fields are missing
+            }
+
+            console.log('Retrieved data from sessionStorage:', { key, data })
+
+            const productSlug = createSlug(data.name)
             if (productSlug === slug) {
               const enhancedData = {
                 ...data,
-                _id: parseInt(data._id || data.id), // Ensure _id exists
-                id: parseInt(data.id),
-                isVerified: true,
+                _id: parseInt(data._id || data.id), // Ensure _id is a number
+                id: parseInt(data.id), // Ensure id is a number
+                isVerified: data.isVerified !== undefined ? data.isVerified : true,
                 pricing: data.pricing || 'freemium',
               }
+              console.log('Matched product in sessionStorage:', enhancedData)
               setProduct(enhancedData)
+              console.log('Setting product with data:', enhancedData)
               setLoading(false)
-              return
+              return // Exit after finding a match
             }
           }
         }
+        console.log(`No matching product found in sessionStorage for slug: ${slug}`)
       } catch (error) {
         console.error('Error retrieving stored product data:', error)
       }
@@ -481,7 +520,6 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
   }, [slug, searchParams])
 
   useEffect(() => {
-    console.log(product)
     if (product && product.tag) {
       fetchSimilarTools(product.tag)
     }
@@ -796,39 +834,53 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                       <p className="text-gray-800 leading-relaxed mb-6">{product.overview}</p>
                       <h3 className="text-2xl font-semibold text-gray-900 mb-4">Key Features:</h3>
                       <p className="text-gray-800 leading-relaxed mb-6">
-                        {(product.key_features as string)
-                          ?.split('\n')
-                          .map((line: string, index: number) => (
-                            <span key={index} className="block">
-                              {line}
-                            </span>
-                          ))}
+                        {product.key_features ? (
+                          (product.key_features as string)
+                            ?.split('\n')
+                            .map((line: string, index: number) => (
+                              <span key={index} className="block">
+                                {line}
+                              </span>
+                            ))
+                        ) : (
+                          <span>No key features available.</span>
+                        )}
                       </p>
 
                       <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                         What you can do with {product.name}:
                       </h3>
                       <p className="text-gray-800 leading-relaxed mb-6">
-                        {(product.what_you_can_do_with as string)
-                          ?.split('\n')
-                          .map((line: string, index: number) => (
-                            <span key={index} className="block mb-1">
-                              {line}
-                            </span>
-                          ))}
+                        {product.what_you_can_do_with ? (
+                          (product.what_you_can_do_with as string)
+                            ?.split('\n')
+                            .map((line: string, index: number) => (
+                              <span key={index} className="block mb-1">
+                                {line}
+                              </span>
+                            ))
+                        ) : (
+                          <span>No use cases available.</span>
+                        )}
                       </p>
                       <h3 className="text-2xl font-semibold text-gray-900 mb-4">Benefits:</h3>
-                      <p className="text-gray-800 leading-relaxed mb-6">{product.benefits}</p>
+                      <p className="text-gray-800 leading-relaxed mb-6">
+                        {product.benefits || <span>No benefits listed.</span>}
+                      </p>
                       <h3 className="text-2xl font-semibold text-gray-900 mb-4">Pricing Plans</h3>
-                      <p className="text-gray-800 leading-relaxed mb-6">{product.pricing_plans}</p>
+                      <p className="text-gray-800 leading-relaxed mb-6">
+                        {product.pricing_plans || <span>No pricing plans available.</span>}
+                      </p>
                       <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                         Tips & Best Practices
                       </h3>
                       <p className="text-gray-800 leading-relaxed mb-6">
-                        {product.tips_best_practices}
+                        {product.tips_best_practices || <span>No tips available.</span>}
                       </p>
                       <h3 className="text-2xl font-semibold text-gray-900 mb-4">Final Thoughts</h3>
-                      <p className="text-gray-800 leading-relaxed mb-6">{product.final_take}</p>
+                      <p className="text-gray-800 leading-relaxed mb-6">
+                        {product.final_take || <span>No final thoughts available.</span>}
+                      </p>
                     </>
                   ) : (
                     <>

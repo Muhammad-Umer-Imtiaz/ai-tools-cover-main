@@ -1,45 +1,70 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { FiSearch, FiCalendar, FiEye, FiClock } from 'react-icons/fi'
 import { FaBlog, FaFire } from 'react-icons/fa'
+import debounce from 'lodash/debounce' // Assuming lodash is installed; if not, implement a simple debounce
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState('')
   const [blogs, setBlogs] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
-  // Fetch posts from API
+  // Debounced search setter
+  const debouncedSetSearchTerm = useCallback(
+    debounce((value: string) => {
+      setDebouncedSearchTerm(value)
+    }, 300),
+    []
+  )
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchTerm(value)
+    debouncedSetSearchTerm(value)
+  }
+
+  // Fetch posts from API (with caching enabled for subsequent loads)
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setError(null)
-        sessionStorage.removeItem('posts') // 👈 clear old/bad cache while testing
+        // Check cache first
+        if (typeof window !== 'undefined') {
+          const cached = sessionStorage.getItem('posts')
+          if (cached) {
+            const parsed = JSON.parse(cached)
+            if (Array.isArray(parsed)) {
+              setBlogs(parsed)
+              setLoading(false)
+              return // Use cache if valid
+            }
+          }
+        }
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/posts`, {
-          cache: 'no-store',
+          next: { revalidate: 3600 }, // ISR-like revalidation every hour
         })
         console.log(res)
         if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`)
 
         const data = await res.json()
-        setBlogs(data.posts)
         console.log('API full response:', data)
 
-        // if (Array.isArray(data.data)) {
-        //   setBlogs(data.data)
-        //   sessionStorage.setItem('posts', JSON.stringify(data.data))
-        // } else if (Array.isArray(data)) {
-        //   // Handle case where data is directly an array
-        //   setBlogs(data)
-        //   sessionStorage.setItem('posts', JSON.stringify(data))
-        // } else {
-        //   console.error('Unexpected response shape:', data)
-        //   setBlogs([])
-        //   setError('Unexpected data format received from server')
-        // }
+        const posts = data.posts || data.data || data || []
+        if (Array.isArray(posts)) {
+          setBlogs(posts)
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('posts', JSON.stringify(posts))
+          }
+        } else {
+          console.error('Unexpected response shape:', data)
+          setBlogs([])
+          setError('Unexpected data format received from server')
+        }
       } catch (err) {
         console.error('Error fetching posts:', err)
         setError(err instanceof Error ? err.message : 'Failed to fetch posts')
@@ -52,7 +77,8 @@ export default function Page() {
     fetchPosts()
   }, [])
 
-  const getExcerpt = (content: any) => {
+  // Memoized excerpt function
+  const getExcerpt = useCallback((content: any) => {
     try {
       // Handle different content structures
       if (typeof content === 'string') {
@@ -75,9 +101,10 @@ export default function Page() {
     } catch {
       return 'Read this amazing blog post to learn more...'
     }
-  }
+  }, [])
 
-  const formatDate = (dateString: string) => {
+  // Memoized date formatter
+  const formatDate = useCallback((dateString: string) => {
     try {
       const date = new Date(dateString)
       if (isNaN(date.getTime())) {
@@ -91,9 +118,10 @@ export default function Page() {
     } catch {
       return 'Date unavailable'
     }
-  }
+  }, [])
 
-  const getReadingTime = (content: any) => {
+  // Memoized reading time function
+  const getReadingTime = useCallback((content: any) => {
     try {
       let wordCount = 0
 
@@ -111,17 +139,30 @@ export default function Page() {
     } catch {
       return 3
     }
-  }
+  }, [])
 
-  const filteredBlogs = blogs.filter((blog) => {
-    if (!searchTerm.trim()) return true // Show all blogs when search is empty
+  // Memoized filtered blogs
+  const filteredBlogs = useMemo(() => {
+    if (!debouncedSearchTerm.trim()) return blogs
 
-    const searchLower = searchTerm.toLowerCase().trim()
-    const titleMatch = blog.title?.toLowerCase().includes(searchLower) || false
-    const contentMatch = getExcerpt(blog.content).toLowerCase().includes(searchLower)
+    const searchLower = debouncedSearchTerm.toLowerCase().trim()
+    return blogs.filter((blog) => {
+      const titleMatch = blog.title?.toLowerCase().includes(searchLower) || false
+      const contentMatch = getExcerpt(blog.content).toLowerCase().includes(searchLower)
 
-    return titleMatch || contentMatch
-  })
+      return titleMatch || contentMatch
+    })
+  }, [blogs, debouncedSearchTerm, getExcerpt])
+
+  // Memoized blog cards data (pre-compute excerpts, dates, etc.)
+  const processedBlogs = useMemo(() => {
+    return filteredBlogs.map((blog) => ({
+      ...blog,
+      excerpt: getExcerpt(blog.content),
+      formattedDate: formatDate(blog.publishedAt || blog.createdAt),
+      readingTime: getReadingTime(blog.content),
+    }))
+  }, [filteredBlogs, getExcerpt, formatDate, getReadingTime])
 
   if (loading) {
     return (
@@ -191,32 +232,21 @@ export default function Page() {
               type="text"
               placeholder="Search articles..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
             />
           </div>
-          {searchTerm && (
+          {debouncedSearchTerm && (
             <div className="mt-2 text-sm text-gray-600">
-              {filteredBlogs.length} article{filteredBlogs.length !== 1 ? 's' : ''} found
+              {processedBlogs.length} article{processedBlogs.length !== 1 ? 's' : ''} found
             </div>
           )}
         </div>
 
-        {/* Debug info (remove in production)
-        {process.env.NODE_ENV === 'development' && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-yellow-800">
-              Debug: Total blogs: {blogs.length}, Filtered: {filteredBlogs.length}, Search: "
-              {searchTerm}"
-            </p>
-            </div>
-        )}
-           */}
-
         {/* Blog Grid */}
-        {filteredBlogs.length > 0 ? (
+        {processedBlogs.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredBlogs.map((blog, index) => (
+            {processedBlogs.map((blog, index) => (
               <article
                 key={blog._id || blog.id || index}
                 className="bg-white/90 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group hover:scale-105"
@@ -226,7 +256,7 @@ export default function Page() {
                     src={blog.heroImage?.cloudinary_url}
                     alt={blog.title || 'Blog post'}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    
+                    loading={index > 3 ? 'lazy' : 'eager'} // Lazy load non-visible images
                   />
                   <div className="absolute top-4 left-4">
                     <span className="bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
@@ -239,15 +269,15 @@ export default function Page() {
                     {blog.title || 'Untitled Post'}
                   </h2>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                    {getExcerpt(blog.content)}
+                    {blog.excerpt}
                   </p>
                   <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
                     <div className="flex items-center gap-3">
                       <span className="flex items-center gap-1">
-                        <FiCalendar size={12} /> {formatDate(blog.publishedAt || blog.createdAt)}
+                        <FiCalendar size={12} /> {blog.formattedDate}
                       </span>
                       <span className="flex items-center gap-1">
-                        <FiClock size={12} /> {getReadingTime(blog.content)} min read
+                        <FiClock size={12} /> {blog.readingTime} min read
                       </span>
                     </div>
                   </div>
@@ -274,10 +304,13 @@ export default function Page() {
           // No blogs match search
           <div className="text-center py-16">
             <div className="text-gray-400 text-6xl mb-4">🔍</div>
-            <p className="text-gray-600 text-lg mb-2">No articles found matching "{searchTerm}"</p>
+            <p className="text-gray-600 text-lg mb-2">No articles found matching "{debouncedSearchTerm}"</p>
             <p className="text-gray-500 mb-4">Try adjusting your search terms</p>
             <button
-              onClick={() => setSearchTerm('')}
+              onClick={() => {
+                setSearchTerm('')
+                debouncedSetSearchTerm('')
+              }}
               className="text-purple-600 hover:text-purple-700 underline font-medium"
             >
               Show all articles

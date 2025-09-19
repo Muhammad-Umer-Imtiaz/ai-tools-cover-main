@@ -49,6 +49,7 @@
     "dotenv": "16.4.7",
     "formidable": "^3.5.4",
     "graphql": "^16.11.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.511.0",
     "multer": "^2.0.2",
     "next": "15.4.4",

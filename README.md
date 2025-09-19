@@ -24,9 +24,6 @@ gift ideas
 fashion
 religion
 
-
-
-
 available categories in csv
 translators  
 presentations  
