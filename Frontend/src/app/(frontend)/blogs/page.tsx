@@ -1,10 +1,21 @@
 'use client'
 
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { FiSearch, FiCalendar, FiEye, FiClock } from 'react-icons/fi'
 import { FaBlog, FaFire } from 'react-icons/fa'
-import debounce from 'lodash/debounce' // Assuming lodash is installed; if not, implement a simple debounce
+
+// Simple debounce implementation
+function useDebounce(callback: Function, delay: number) {
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  return useCallback((...args: any[]) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    timeoutRef.current = setTimeout(() => callback(...args), delay)
+  }, [callback, delay])
+}
 
 export default function Page() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -14,12 +25,9 @@ export default function Page() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
 
   // Debounced search setter
-  const debouncedSetSearchTerm = useCallback(
-    debounce((value: string) => {
-      setDebouncedSearchTerm(value)
-    }, 300),
-    []
-  )
+  const debouncedSetSearchTerm = useDebounce((value: string) => {
+    setDebouncedSearchTerm(value)
+  }, 300)
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
