@@ -1,5 +1,5 @@
 // app/blogs/layout.tsx
-import { Metadata } from 'next';
+import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'AI Tools Cover Blog - Latest Articles on AI Tools & Productivity',
@@ -45,12 +45,11 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'AI Tools Cover Blog',
-    description:
-      'Explore the latest articles and tutorials about AI tools, productivity, and AI.',
+    description: 'Explore the latest articles and tutorials about AI tools, productivity, and AI.',
     images: ['https://aitoolscover.com/logo.png'],
     creator: '@aitoolscover',
   },
-};
+}
 
 export default function BlogsLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -83,5 +82,5 @@ export default function BlogsLayout({ children }: { children: React.ReactNode })
       />
       {children}
     </>
-  );
+  )
 }

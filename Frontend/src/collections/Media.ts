@@ -86,9 +86,6 @@ export const Media: CollectionConfig = {
     { name: 'alt', type: 'text', required: false },
     { name: 'cloudinary_url', type: 'text', required: false, admin: { readOnly: true } },
     { name: 'cloudinary_public_id', type: 'text', required: false, admin: { readOnly: true } },
-    // Add optimized URLs for different use cases
-    { name: 'cloudinary_url_optimized', type: 'text', required: false, admin: { readOnly: true } },
-    { name: 'cloudinary_url_thumbnail', type: 'text', required: false, admin: { readOnly: true } },
   ],
   hooks: {
     afterChange: [
@@ -96,7 +93,7 @@ export const Media: CollectionConfig = {
         try {
           // Handle image upload to Cloudinary
           if (IMAGE_MIME_TYPES.includes(doc.mimeType)) {
-            (async () => {
+            ;(async () => {
               try {
                 if (!isCloudinaryConfigured) {
                   console.log('Cloudinary not configured, keeping image locally')
@@ -117,50 +114,18 @@ export const Media: CollectionConfig = {
                   public_id: `${Date.now()}_${path.parse(doc.filename).name}`,
                   resource_type: 'auto',
                   overwrite: false,
-                  timeout: 60000,
+                  timeout: 60000, // Increased timeout to 60 seconds
                   use_filename: false,
                   unique_filename: true,
-                  // Optimization settings
-                  format: 'auto', // Automatically choose best format (WebP, AVIF when supported)
-                  quality: 'auto:good', // Automatic quality optimization
-                  fetch_format: 'auto', // Deliver modern formats when supported
-                  flags: ['progressive'], // Progressive JPEG loading
                   transformation: [
-                    {
-                      // Primary optimization: reduce file size while maintaining quality
-                      quality: 'auto:good',
-                      fetch_format: 'auto',
-                      flags: 'progressive'
-                    }
-                  ]
+                    { width: 1200, height: 1200, crop: 'limit' }, // limit max width/height
+                    { quality: 'auto', fetch_format: 'auto' }, // automatic quality & format
+                  ],
                 })
 
                 console.log('Image upload successful', uploadResult)
                 console.log(`Image uploaded to Cloudinary: ${uploadResult.secure_url}`)
                 console.log(`Image public ID: ${uploadResult.public_id}`)
-
-                // Generate optimized URLs for different use cases
-                const optimizedUrl = cloudinary.url(uploadResult.public_id, {
-                  format: 'auto',
-                  quality: 'auto:good',
-                  fetch_format: 'auto',
-                  flags: 'progressive',
-                  width: 1200,
-                  height: 800,
-                  crop: 'limit', // Don't upscale, only downscale if needed
-                  dpr: 'auto', // Automatic device pixel ratio
-                })
-
-                const thumbnailUrl = cloudinary.url(uploadResult.public_id, {
-                  format: 'auto',
-                  quality: 'auto:good',
-                  fetch_format: 'auto',
-                  width: 400,
-                  height: 300,
-                  crop: 'fill',
-                  gravity: 'auto', // Smart cropping
-                  dpr: 'auto',
-                })
 
                 const updatedDoc = await req.payload.update({
                   collection: 'media',
@@ -168,12 +133,10 @@ export const Media: CollectionConfig = {
                   data: {
                     cloudinary_url: uploadResult.secure_url,
                     cloudinary_public_id: uploadResult.public_id,
-                    cloudinary_url_optimized: optimizedUrl,
-                    cloudinary_url_thumbnail: thumbnailUrl,
                   },
                 } as any)
 
-                console.log(`Updated media document with Cloudinary URLs: ${doc.id}`)
+                console.log(`Updated media document with Cloudinary URL: ${doc.id}`, updatedDoc)
 
                 // Delete local file after successful database update
                 if (fs.existsSync(filePath)) {
