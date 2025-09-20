@@ -406,12 +406,11 @@ export const toolFeature = async (req, res) => {
           hasPrevPage: hasPrevPage,
           nextPage: hasNextPage ? page + 1 : null,
           prevPage: hasPrevPage ? page - 1 : null,
-        }
-      }
+        },
+      },
     });
-
   } catch (error) {
-    console.error('Error in toolFeature:', error);
+    console.error("Error in toolFeature:", error);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -442,13 +441,41 @@ export const aiToolsFeatures = async (req, res) => {
     const results = {};
 
     for (const category of features) {
-      const tools = await Tool.find({ category }).limit(6).lean();
+      const tools = await Tool.find({ category })
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .lean();
       results[category] = tools;
     }
 
     res.json({ success: true, data: results });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getAllToolsCategories = async (req, res) => {
+  try {
+    const { slug } = req.query; // e.g. "website-builders"
+    if (!slug) {
+      return res.status(400).json({ error: "Category slug is required" });
+    }
+
+    // Fetch tools by category slug
+    const tools = await Tool.find({ category: slug })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .lean();
+
+    res.json({
+      success: true,
+      category: slug,
+      totalCount: tools.length,
+      tools,
+    });
+  } catch (error) {
+    console.error("Error fetching category tools:", error);
     res.status(500).json({ error: error.message });
   }
 };

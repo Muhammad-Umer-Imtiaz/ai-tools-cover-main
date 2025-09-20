@@ -11,6 +11,7 @@ import {
   FeaturedTools,
   findToolByUser,
   getAllTools,
+  getAllToolsCategories,
   getSingleTool,
   pagination,
   Search,
@@ -55,7 +56,7 @@ router.post("/add", upload.single("file"), addTool);
 router.get("/get-all-tools", getAllTools);
 router.post("/addtool", isAuthenticated, AddTool);
 router.get("/getsingletool/:slug", getSingleTool);
-router.get("/featuredtools",FeaturedTools)
+router.get("/featuredtools", FeaturedTools);
 router.post("/submit/:id", isAuthenticated, submitTool);
 router.get("/tool-by-user", isAuthenticated, findToolByUser);
 router.get("/search", Search);
@@ -63,6 +64,7 @@ router.get("/pagination", pagination);
 router.get("/category", categoryPagination);
 router.get("/suggestions", suggestions);
 router.get("/toolfeature", toolFeature);
-router.get("/ai-tools-features",aiToolsFeatures)
+router.get("/getall", getAllToolsCategories);
+router.get("/ai-tools-features", aiToolsFeatures);
 
 export default router;
