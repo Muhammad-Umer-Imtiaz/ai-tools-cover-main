@@ -294,7 +294,7 @@ const CategoryOverviewPage = () => {
                 {tools.slice(0, 8).map((tool, index) => (
                   <Link
                     key={tool._id}
-                    href={`/ai-tools/${createToolSlug(tool.name)}`}
+                    href={`/tool/${createToolSlug(tool.name)}`}
                     onClick={() => storeProductData(tool)}
                   >
                     <div

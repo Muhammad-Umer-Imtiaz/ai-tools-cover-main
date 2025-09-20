@@ -21,60 +21,40 @@ type Tool = {
   created_at?: string
 }
 
-interface ProductTool {
-  _id: number
-  name: string
-  link: string
-  image_url: string
-  thumbnail_url: string
-  overview: string
-  tags: string
-  created_at: string
-  is_approved: boolean
-  click_count: number
-  views: number
-  developer: string | null
-  category: string
-  submitted_by: string | null
+interface ProductTool extends Tool {
+  is_approved?: boolean
+  developer?: string | null
+  submitted_by?: string | null
 }
 
 const useFavorites = () => {
   const [favorites, setFavorites] = useState<ProductTool[]>([])
 
+  // Load from localStorage once
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedFavorites = localStorage.getItem('favoriteTools')
       if (savedFavorites) {
         try {
-          const parsed = JSON.parse(savedFavorites)
-          const standardized = parsed.map((t: any) => ({
-            ...t,
-            _id: parseInt(t._id || t.id),
-          }))
-          setFavorites(standardized)
-        } catch (error) {
-          console.error('Error parsing saved favorites:', error)
+          setFavorites(JSON.parse(savedFavorites))
+        } catch (e) {
+          console.error('Error parsing favorites', e)
           localStorage.removeItem('favoriteTools')
         }
       }
     }
   }, [])
 
-  const addToFavorites = (tool: any) => {
+  const saveToLocalStorage = (items: ProductTool[]) => {
+    localStorage.setItem('favoriteTools', JSON.stringify(items))
+  }
+
+  const addToFavorites = (tool: ProductTool) => {
     setFavorites((prev) => {
-      const toolId = parseInt(tool._id || tool.id)
-      if (prev.some((t) => t._id === toolId)) {
-        return prev
-      }
-      const standardizedTool = {
-        _id: toolId,
-        ...tool,
-      }
-      const updatedFavorites = [...prev, standardizedTool]
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites))
-      }
-      toast.success(`${tool.name || 'Tool'} added to favorites!`, {
+      if (prev.some((t) => t._id === tool._id)) return prev
+      const updated = [...prev, tool]
+      saveToLocalStorage(updated)
+      toast.success(`${tool.name} added to favorites!`, {
         duration: 3000,
         position: 'top-right',
         style: {
@@ -86,17 +66,15 @@ const useFavorites = () => {
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
         },
       })
-      return updatedFavorites
+      return updated
     })
   }
 
-  const removeFromFavorites = (toolId: number) => {
+  const removeFromFavorites = (toolId: string | number) => {
     setFavorites((prev) => {
-      const toolToRemove = prev.find((tool) => tool._id === toolId)
-      const updatedFavorites = prev.filter((tool) => tool._id !== toolId)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites))
-      }
+      const toolToRemove = prev.find((t) => t._id === toolId)
+      const updated = prev.filter((t) => t._id !== toolId)
+      saveToLocalStorage(updated)
       toast.success(`${toolToRemove?.name || 'Tool'} removed from favorites!`, {
         duration: 3000,
         position: 'top-right',
@@ -109,48 +87,38 @@ const useFavorites = () => {
           boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
         },
       })
-      return updatedFavorites
+      return updated
     })
   }
 
-  const isFavorite = (toolId: number) => {
-    return favorites.some((tool) => tool._id === toolId)
-  }
+  const isFavorite = (toolId: string | number) =>
+    favorites.some((t) => t._id === toolId)
 
-  const toggleFavorite = (tool: { _id: number }) => {
-    const toolId = parseInt(String(tool._id))
-    if (isFavorite(toolId)) {
-      removeFromFavorites(toolId)
+  const toggleFavorite = (tool: ProductTool) => {
+    if (isFavorite(tool._id)) {
+      removeFromFavorites(tool._id)
     } else {
       addToFavorites(tool)
     }
   }
 
-  return {
-    favorites,
-    addToFavorites,
-    removeFromFavorites,
-    isFavorite,
-    toggleFavorite,
-  }
+  return { favorites, isFavorite, toggleFavorite }
 }
 
 interface HeartButtonProps {
-  tool: any
+  tool: ProductTool
   isFavorite: boolean
-  onToggle: (tool: any) => void
+  onToggle: (tool: ProductTool) => void
 }
 
 const HeartButton: React.FC<HeartButtonProps> = ({ tool, isFavorite, onToggle }) => {
   const [isAnimating, setIsAnimating] = useState(false)
 
-  const handleClick = (e: { preventDefault: () => void; stopPropagation: () => void }) => {
+  const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-
     setIsAnimating(true)
     onToggle(tool)
-
     setTimeout(() => setIsAnimating(false), 300)
   }
 
@@ -159,10 +127,14 @@ const HeartButton: React.FC<HeartButtonProps> = ({ tool, isFavorite, onToggle })
       onClick={handleClick}
       className={`p-2 rounded-full transition-all duration-300 hover:scale-110 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md ${
         isAnimating ? 'animate-pulse' : ''
-      } ${isFavorite ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+      }`}
       aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
     >
-      {isFavorite ? <FaHeart size={18} className="drop-shadow-sm" /> : <FiHeart size={18} />}
+      {isFavorite ? (
+        <FaHeart size={18} className="drop-shadow-sm text-red-500" />
+      ) : (
+        <FiHeart size={18} className="text-gray-400 hover:text-red-500" />
+      )}
     </button>
   )
 }
@@ -179,30 +151,28 @@ const CategoryPage = () => {
   const [totalResults, setTotalResults] = useState(0)
 
   const TOOLS_PER_LOAD = 18
-
   const { isFavorite, toggleFavorite } = useFavorites()
 
   useEffect(() => {
-    // Get category from URL path
     const path = window.location.pathname
     const category = path.split('/category/')[1]
     if (category) {
-      const decodedCategory = decodeURIComponent(category).replace(/\s+/g, '-')
-      console.log('Decoded Category ', decodedCategory)
-      setCategoryName(decodedCategory)
+      const decoded = decodeURIComponent(category).replace(/\s+/g, '-')
+      console.log('Decoded Category ', decoded)
+      setCategoryName(decoded)
 
-      // Check for cached data first
+      // Restore cached tools if available
       if (typeof window !== 'undefined') {
         const savedTools = sessionStorage.getItem('categoryDisplayedTools')
         const savedOffset = sessionStorage.getItem('categoryCurrentOffset')
+        const savedCategory = sessionStorage.getItem('cachedCategoryName')
         const savedTimestamp = sessionStorage.getItem('categoryToolsTimestamp')
         const savedHasMore = sessionStorage.getItem('categoryHasMoreTools')
-        const savedCategory = sessionStorage.getItem('cachedCategoryName')
 
-        const isDataFresh = savedTimestamp && Date.now() - parseInt(savedTimestamp) < 5 * 60 * 1000 // 5 minutes
+        const fresh =
+          savedTimestamp && Date.now() - parseInt(savedTimestamp) < 5 * 60 * 1000
 
-        // Check if cached data is for the same category
-        if (savedTools && savedOffset && isDataFresh && savedCategory === decodedCategory) {
+        if (savedTools && savedOffset && savedCategory === decoded && fresh) {
           try {
             const parsedTools = JSON.parse(savedTools)
             setDisplayedTools(parsedTools)
@@ -217,13 +187,11 @@ const CategoryPage = () => {
         }
       }
 
-      // Fetch tools if no cache or cache is stale
-      fetchInitialTools(decodedCategory)
+      fetchInitialTools(decoded)
     }
   }, [])
 
   useEffect(() => {
-    // Cache the tools data
     if (typeof window !== 'undefined' && displayedTools.length > 0 && categoryName) {
       try {
         sessionStorage.setItem('categoryDisplayedTools', JSON.stringify(displayedTools))
@@ -252,18 +220,12 @@ const CategoryPage = () => {
     try {
       setLoading(true)
       setError(null)
-
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/category/?category=${category}&limit=${TOOLS_PER_LOAD}&offset=0`,
       )
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       const data = await response.json()
       const tools = data.results || []
-
       setDisplayedTools(tools)
       setTotalResults(data.total_results || tools.length)
       setCurrentOffset(TOOLS_PER_LOAD)
@@ -283,11 +245,7 @@ const CategoryPage = () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/category/?category=${encodeURIComponent(categoryName)}&limit=${TOOLS_PER_LOAD}&offset=${currentOffset}`,
       )
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       const data = await response.json()
       const newTools = data.results || []
       setDisplayedTools((prev) => [...prev, ...newTools])
@@ -295,9 +253,7 @@ const CategoryPage = () => {
       if (newTools.length < TOOLS_PER_LOAD) {
         setHasMoreTools(false)
       }
-      console.log(
-        `Loaded ${newTools.length} more tools. Total: ${displayedTools.length + newTools.length}`,
-      )
+      console.log(`Loaded ${newTools.length} more tools. Total: ${displayedTools.length + newTools.length}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while loading more tools')
       console.error('Error loading more tools:', err)
@@ -305,6 +261,7 @@ const CategoryPage = () => {
       setLoadingMore(false)
     }
   }
+
   const handleBackClick = () => {
     window.history.back()
   }
@@ -336,6 +293,7 @@ const CategoryPage = () => {
       }
     }
   }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
@@ -407,7 +365,6 @@ const CategoryPage = () => {
                 onClick={() => storeProductData(tool)}
               >
                 <div
-                  key={tool._id}
                   className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border border-gray-100 cursor-pointer relative"
                   style={{
                     height: '169px',
@@ -424,18 +381,8 @@ const CategoryPage = () => {
                   {/* Heart Button - Positioned absolutely in top-right */}
                   <div className="absolute top-3 right-3 z-10">
                     <HeartButton
-                      tool={{
-                        _id: tool._id,
-                        name: tool.name,
-                        category: tool.category,
-                        overview: tool.overview,
-                        image: tool.image_url,
-                        thumbnail: tool.thumbnail_url,
-                        views: tool.views,
-                        click_count: tool.click_count,
-                        link: tool.link,
-                      }}
-                      isFavorite={isFavorite(Number(tool._id))}
+                      tool={tool as ProductTool}
+                      isFavorite={isFavorite(tool._id)}
                       onToggle={toggleFavorite}
                     />
                   </div>
@@ -505,6 +452,7 @@ const CategoryPage = () => {
             </button>
           </div>
         )}
+
         {/* Load More Button */}
         {!loading && !error && displayedTools.length > 0 && hasMoreTools && (
           <div className="text-center mt-12">

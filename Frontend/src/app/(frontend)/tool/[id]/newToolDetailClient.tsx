@@ -26,7 +26,7 @@ import {
   FaDollarSign,
   FaGift,
 } from 'react-icons/fa'
-import { featuredTools, featuredProducts } from '@/constants'
+import { featuredProducts } from '@/constants'
 import toast from 'react-hot-toast'
 
 const createSlug = (name: string): string => {
@@ -83,6 +83,8 @@ interface ToolDetailClientProps {
 
 function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
   const [product, setProduct] = useState<any>(null)
+  const [featureTools, setFeatureTools] = useState<any>(null)
+  const [featuredToolsLoading, setFeaturedToolsLoading] = useState(true)
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [similarTools, setSimilarTools] = useState<SimilarTool[]>([])
@@ -524,6 +526,60 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
       fetchSimilarTools(product.tag)
     }
   }, [product])
+
+  // Fixed: Separate useEffect for featured tools with proper loading state
+  useEffect(() => {
+    const fetchFeaturedTools = async () => {
+      setFeaturedToolsLoading(true)
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/featuredtools`)
+        const data = await res.json()
+        console.log('Data from Featured Tools', data)
+        if (data.success && data.tools) {
+          // Transform the API data to match the expected format
+          const transformedTools = data.tools.map((tool: any) => ({
+            ...tool,
+            _id: tool._id,
+            id: tool._id, // Add id for consistency
+            logo:
+              tool.image_url ||
+              tool.image ||
+              'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=50&h=50&fit=crop',
+            image:
+              tool.image_url ||
+              tool.image ||
+              'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop',
+            thumbnail:
+              tool.thumbnail_url ||
+              tool.image_url ||
+              tool.image ||
+              'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500&h=400&fit=crop',
+            tag: tool.category || 'AI Tool',
+            tagIcon: '🤖',
+            link: tool.link || tool.website || '#',
+            rating: 4.5 + Math.random() * 0.5,
+            reviewCount: Math.floor(Math.random() * 500) + 50,
+            isVerified: tool.is_approved || false,
+            pricing: 'freemium',
+            views: tool.views || Math.floor(Math.random() * 10000) + 1000,
+            clicks: tool.click_count || Math.floor(Math.random() * 3000) + 500,
+          }))
+          setFeatureTools(transformedTools)
+          console.log('Transformed featured tools:', transformedTools)
+        } else {
+          console.error('No featured tools found in response')
+          setFeatureTools([])
+        }
+      } catch (err) {
+        console.error('Error fetching featured tools:', err)
+        setFeatureTools([])
+      } finally {
+        setFeaturedToolsLoading(false)
+      }
+    }
+
+    fetchFeaturedTools()
+  }, [])
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -1041,41 +1097,59 @@ function ToolDetailClient({ slug, searchParams }: ToolDetailClientProps) {
                   <div className="w-10 h-10 bg-gradient-to-r from-[#7d42fb] to-[#9b59ff] rounded-xl flex items-center justify-center">
                     <FiStar className="text-white" size={20} />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900">Featured Tools</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {featuredToolsLoading ? 'Featured Tools' : 'Featured Tools'}
+                  </h3>
                 </div>
 
                 <div className="space-y-3">
-                  {featuredTools.map((tool, index) => (
-                    <a
-                      key={index}
-                      href={tool.link}
-                      className="flex items-center gap-3 p-4 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 transition-all duration-300 group border border-gray-100 hover:border-[#7d42fb]/30 hover:shadow-md"
-                    >
-                      <div className="relative">
-                        <img
-                          src={tool.logo}
-                          alt={tool.name}
-                          className="w-12 h-12 rounded-lg object-cover shadow-sm"
-                        />
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-[#7d42fb] to-[#9b59ff] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <span className="font-semibold text-gray-900 group-hover:text-[#7d42fb] transition-colors block truncate">
-                          {tool.name}
-                        </span>
-                        <span className="text-xs text-gray-500 group-hover:text-gray-600">
-                          Featured Tool
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <FiExternalLink
-                          size={18}
-                          className="text-gray-400 group-hover:text-[#7d42fb] transition-colors group-hover:transform group-hover:scale-110 duration-300"
-                        />
-                      </div>
-                    </a>
-                  ))}
+                  {featuredToolsLoading ? (
+                    <div className="flex items-center justify-center py-4">
+                      <div className="w-6 h-6 border-2 border-[#7d42fb] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : featureTools && featureTools.length > 0 ? (
+                    featureTools.slice(0, 6).map((tool: any, index: number) => (
+                      <a
+                        key={tool._id || index}
+                        href={tool.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 p-4 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-blue-50 transition-all duration-300 group border border-gray-100 hover:border-[#7d42fb]/30 hover:shadow-md"
+                      >
+                        <div className="relative">
+                          <img
+                            src={tool.logo || tool.image_url}
+                            alt={tool.name}
+                            className="w-12 h-12 rounded-lg object-cover shadow-sm"
+                            onError={(e) => {
+                              e.currentTarget.src =
+                                'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=50&h=50&fit=crop'
+                            }}
+                          />
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-[#7d42fb] to-[#9b59ff] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <span className="font-semibold text-gray-900 group-hover:text-[#7d42fb] transition-colors block truncate">
+                            {tool.name}
+                          </span>
+                          <span className="text-xs text-gray-500 group-hover:text-gray-600">
+                            {tool.tag || 'Featured Tool'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                          <FiExternalLink
+                            size={18}
+                            className="text-gray-400 group-hover:text-[#7d42fb] transition-colors group-hover:transform group-hover:scale-110 duration-300"
+                          />
+                        </div>
+                      </a>
+                    ))
+                  ) : (
+                    <div className="text-center py-4 text-gray-500 text-sm">
+                      No featured tools available
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

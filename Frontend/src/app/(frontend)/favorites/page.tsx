@@ -5,71 +5,67 @@ import { FiExternalLink, FiHeart, FiStar, FiTrash2 } from 'react-icons/fi';
 import { FaHeart, FaHeartBroken } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 
-// Custom hook for managing favorites (same as in AllProduct)
+// Updated custom hook to match CategoryPage functionality
 const useFavorites = () => {
   const [favorites, setFavorites] = useState<any[]>([]);
 
   useEffect(() => {
-    // Load favorites from localStorage on component mount
     if (typeof window !== 'undefined') {
       const savedFavorites = localStorage.getItem('favoriteTools');
       if (savedFavorites) {
         try {
           setFavorites(JSON.parse(savedFavorites));
-        } catch (error) {
-          console.error('Error parsing saved favorites:', error);
+        } catch (e) {
+          console.error('Error parsing favorites', e);
           localStorage.removeItem('favoriteTools');
         }
       }
     }
   }, []);
 
-  const addToFavorites = (tool: any) => {
-    const updatedFavorites = [...favorites, tool];
-    setFavorites(updatedFavorites);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites));
-    }
-
-    console.log('wait');
-    // Show success toast
-    toast.success(`${tool.name || 'Tool'} added to favorites!`, {
-      duration: 3000,
-      position: 'top-right',
-      style: {
-        background: '#7d42fb',
-        color: 'white',
-        fontWeight: 'bold',
-        borderRadius: '8px',
-        padding: '10px 15px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-      },
-    });
-    console.log('added');
+  const saveToLocalStorage = (items: any[]) => {
+    localStorage.setItem('favoriteTools', JSON.stringify(items));
   };
 
-  const removeFromFavorites = (toolId: number) => {
-    // Find the tool name before removing (optional, for better UX)
-    const toolToRemove = favorites.find((tool) => tool.id === toolId);
+  const addToFavorites = (tool: any) => {
+    setFavorites((prev) => {
+      if (prev.some((t) => t._id === tool._id)) return prev;
+      const updated = [...prev, tool];
+      saveToLocalStorage(updated);
+      toast.success(`${tool.name} added to favorites!`, {
+        duration: 3000,
+        position: 'top-right',
+        style: {
+          background: '#7d42fb',
+          color: 'white',
+          fontWeight: 'bold',
+          borderRadius: '8px',
+          padding: '10px 15px',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+        },
+      });
+      return updated;
+    });
+  };
 
-    const updatedFavorites = favorites.filter((tool) => tool.id !== toolId);
-    setFavorites(updatedFavorites);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites));
-    }
-
-    // Show success toast
-    toast.success(`${toolToRemove?.name || 'Tool'} removed from favorites!`, {
-      duration: 3000,
-      position: 'top-right',
-      style: {
-        background: '#7d42fb',
-        color: 'white',
-        fontWeight: 'bold',
-        borderRadius: '8px',
-        padding: '10px 15px',
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-      },
+  const removeFromFavorites = (toolId: string | number) => {
+    setFavorites((prev) => {
+      const toolToRemove = prev.find((t) => t._id === toolId);
+      const updated = prev.filter((t) => t._id !== toolId);
+      saveToLocalStorage(updated);
+      toast.success(`${toolToRemove?.name || 'Tool'} removed from favorites!`, {
+        duration: 3000,
+        position: 'top-right',
+        style: {
+          background: '#7d42fb',
+          color: 'white',
+          fontWeight: 'bold',
+          borderRadius: '8px',
+          padding: '10px 15px',
+          boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+        },
+      });
+      return updated;
     });
   };
 
@@ -80,26 +76,18 @@ const useFavorites = () => {
     }
   };
 
-  const isFavorite = (toolId: any) => {
-    return favorites.some((tool) => tool.id === toolId);
-  };
+  const isFavorite = (toolId: string | number) =>
+    favorites.some((t) => t._id === toolId);
 
-  const toggleFavorite = (tool: { id: any }) => {
-    if (isFavorite(tool.id)) {
-      removeFromFavorites(tool.id);
+  const toggleFavorite = (tool: any) => {
+    if (isFavorite(tool._id)) {
+      removeFromFavorites(tool._id);
     } else {
       addToFavorites(tool);
     }
   };
 
-  return {
-    favorites,
-    addToFavorites,
-    removeFromFavorites,
-    clearAllFavorites,
-    isFavorite,
-    toggleFavorite,
-  };
+  return { favorites, isFavorite, toggleFavorite, removeFromFavorites, clearAllFavorites };
 };
 
 // Heart Button Component for Favorites Page
@@ -123,7 +111,7 @@ const FavoriteHeartButton: React.FC<FavoriteHeartButtonProps> = ({
 
     setIsAnimating(true);
     setTimeout(() => {
-      onRemove(tool.id);
+      onRemove(tool._id);
       setIsAnimating(false);
     }, 300);
   };
@@ -140,17 +128,18 @@ const FavoriteHeartButton: React.FC<FavoriteHeartButtonProps> = ({
     </button>
   );
 };
+
 // Update the ProductTool interface
 interface ProductTool {
-  id: number;
+  _id: string | number;
   name: string;
   link: string;
   image_url?: string;
-  image?: string; // Add this property
+  image?: string;
   thumbnail_url?: string;
-  thumbnail?: string; // Add this property
-  thumnail?: string; // Add this for the typo case
-  description: string;
+  thumbnail?: string;
+  thumnail?: string;
+  overview: string;
   tags?: string;
   created_at?: string;
   is_approved?: boolean;
@@ -163,8 +152,6 @@ interface ProductTool {
 
 // Helper function to create URL-friendly slugs
 const createSlug = (name: string): string => {
-  console.log('I am hitteD!');
-
   return name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -174,29 +161,24 @@ const createSlug = (name: string): string => {
 const storeProductData = (product: ProductTool): void => {
   if (typeof window !== 'undefined') {
     try {
-      // Check all possible property names for thumbnail
       const thumbnailUrl =
         product.thumbnail_url || product.thumbnail || product.thumnail;
 
-      console.log('Product being stored:', product); // For debugging
-      console.log('Thumbnail URL:', thumbnailUrl); // For debugging
-
       const productData = {
-        id: product.id.toString(),
+        _id: product._id.toString(),
         name: product.name,
         image: product.image_url || product.image,
         logo: product.image_url || product.image,
         thumbnail: thumbnailUrl,
-        description: product.description,
+        overview: product.overview,
         tag: product.category,
         tagIcon: '',
         link: product.link,
       };
       sessionStorage.setItem(
-        `product_${product.id}`,
+        `product_${product._id}`,
         JSON.stringify(productData)
       );
-      console.log('Stored product data:', productData);
     } catch (error) {
       console.error('Error storing product data:', error);
     }
@@ -204,13 +186,11 @@ const storeProductData = (product: ProductTool): void => {
 };
 
 const FavoritesPage: React.FC = () => {
-  const { favorites, removeFromFavorites, clearAllFavorites, toggleFavorite } =
-    useFavorites();
+  const { favorites, removeFromFavorites, clearAllFavorites } = useFavorites();
   const [showClearModal, setShowClearModal] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Small delay to ensure localStorage is loaded
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 100);
@@ -295,7 +275,7 @@ const FavoritesPage: React.FC = () => {
           <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8 px-1 sm:px-0">
             {favorites.map((tool, index) => (
               <div
-                key={tool.id}
+                key={tool._id}
                 className="group relative bg-white rounded-lg sm:rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-2 border border-gray-100 overflow-hidden w-full"
                 style={{
                   animationName: 'fadeInUp',
@@ -310,11 +290,26 @@ const FavoritesPage: React.FC = () => {
                   <div className="flex items-start justify-between mb-2 sm:mb-3 lg:mb-4 flex-shrink-0">
                     <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
                       <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 bg-[#7d42fb]/10 rounded-lg sm:rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-                        <img
-                          src={tool.image_url}
-                          alt={tool.name}
-                          className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 object-contain"
-                        />
+                        {tool.image_url || tool.image ? (
+                          <img
+                            src={tool.image_url || tool.image}
+                            alt={tool.name}
+                            className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 object-contain"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                              if (img.nextSibling && img.nextSibling instanceof HTMLElement) {
+                                (img.nextSibling as HTMLElement).style.display = 'flex';
+                              }
+                            }}
+                          />
+                        ) : null}
+                        <div
+                          className="w-full h-full bg-[#7d42fb] rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-xs"
+                          style={{ display: (tool.image_url || tool.image) ? 'none' : 'flex' }}
+                        >
+                          AI
+                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
                         <Link
@@ -348,23 +343,23 @@ const FavoritesPage: React.FC = () => {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        removeFromFavorites(tool.id);
+                        removeFromFavorites(tool._id);
                       }}
                     >
                       <FaHeart size={12} className="sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4" />
                     </button>
                   </div>
 
-                  {/* Tool Description - Responsive content area */}
+                  {/* Tool overview - Responsive content area */}
                   <div className="flex-1 flex flex-col min-h-0">
                     <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 lg:mb-4 line-clamp-2 sm:line-clamp-3 leading-relaxed flex-shrink-0">
-                      {tool.description}
+                      {tool.overview}
                     </p>
 
                     {/* Tool Tags - Responsive visibility */}
                     <div className="flex flex-wrap gap-1 mb-2 sm:mb-3 lg:mb-4 flex-shrink-0">
                       <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-[#7d42fb]/10 text-[#7d42fb] text-xs rounded-full">
-                        {tool.category}
+                        {tool.category || 'AI Tool'}
                       </span>
                       <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-[#7d42fb]/10 text-[#7d42fb] text-xs rounded-full hidden sm:inline-block">
                         AI Tool
@@ -384,14 +379,13 @@ const FavoritesPage: React.FC = () => {
                     {/* Footer - Responsive */}
                     <div className="flex items-center justify-between pt-2 sm:pt-3 lg:pt-4 border-t border-gray-100 flex-shrink-0 mt-auto">
                       <Link
-                        href={tool.link}
+                        href={tool.link || '#'}
                         className="flex items-center gap-1 sm:gap-2 text-[#7d42fb] font-medium hover:text-[#6b35e0] transition-colors text-xs sm:text-sm"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
                         Try Now <FiExternalLink size={10} className="sm:w-3 sm:h-3" />
                       </Link>
-                      <div className="text-xs text-gray-500">#{tool.id}</div>
                     </div>
                   </div>
                 </div>
