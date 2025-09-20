@@ -1,5 +1,5 @@
 // app/layout.tsx
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
+// ✅ SEO Metadata
 export const metadata: Metadata = {
   metadataBase: new URL('https://aitoolscover.com'),
   title: 'AI Tools Cover - Discover the Best AI Tools',
@@ -45,6 +46,14 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'AI Tools Cover Team' }],
   publisher: 'AI Tools Cover',
+}
+
+// ✅ Viewport config alag export me (Next.js 13+)
+export const viewport: Viewport = {
+  themeColor: '#000000',
+  colorScheme: 'dark',
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -80,8 +89,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           content="Find and explore the best AI tools for your needs. Comprehensive directory of artificial intelligence software and applications."
         />
         <meta name="twitter:image" content="https://aitoolscover.com/logo.png" />
-        <meta name="twitter:site" content="@YourTwitterHandle" />{' '}
-        {/* replace with your Twitter handle */}
+        <meta name="twitter:site" content="@YourTwitterHandle" />
         {/* ✅ Schema Markup for SEO */}
         <script
           type="application/ld+json"

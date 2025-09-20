@@ -304,7 +304,7 @@ const SearchContent = () => {
 
           {/* Search Bar - Centered and Responsive */}
           <div className="flex justify-center sm:justify-end w-full sm:w-auto">
-            <div className="relative flex items-center w-full max-w-md sm:max-w-lg rounded-full border-2 border-[#7d42fb] bg-white shadow-lg px-3 sm:px-4 py-2.5 sm:py-3 lg:py-4 transition-all duration-300 hover:shadow-xl hover:scale-105">
+            <div className="relative flex items-center w-full max-w-md sm:min-w-xl rounded-full border-2 border-[#7d42fb] bg-white shadow-lg px-3 sm:px-4 py-2.5 sm:py-3 lg:py-4 transition-all duration-300 hover:shadow-xl hover:scale-105">
               <input
                 type="text"
                 placeholder="Search for AI tools..."
