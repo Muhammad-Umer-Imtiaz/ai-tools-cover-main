@@ -1,34 +1,34 @@
 /* eslint-disable react/no-unescaped-entities */
 
-'use client';
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { AI_TOOLS_CATEGORIES, AIToolCategory } from '@/constants';
+'use client'
+import React, { useState } from 'react'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { AI_TOOLS_CATEGORIES, AIToolCategory } from '@/constants'
 const AIToolsGrid: React.FC = () => {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-  const router = useRouter();
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const router = useRouter()
   const handleCategoryClick = (categoryId: string) => {
     // Create category slug for navigation
-    const categorySlug = categoryId.toLowerCase().replace(/\s+/g, '-');
-    console.log(`Navigating to category: ${categorySlug}`);
+    const categorySlug = categoryId.toLowerCase().replace(/\s+/g, '-')
+    console.log(`Navigating to category: ${categorySlug}`)
     // Navigate to the dynamic category page
-    router.push(`/ai-tools/${categorySlug}`);
-  };
+    router.push(`/ai-tools/${categorySlug}`)
+  }
   const handleFeatureClick = (categoryId: string, feature: string, event: React.MouseEvent) => {
     // Prevent event bubbling to category click
-    event.stopPropagation();
+    event.stopPropagation()
     // Create feature slug for navigation
     const featureSlug = feature
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    console.log(`Navigating to feature: ${featureSlug}`);
+      .replace(/^-+|-+$/g, '')
+    console.log(`Navigating to feature: ${featureSlug}`)
     // Navigate to the specific feature page
-    router.push(`/ai-tools/features/${featureSlug}`);
-  };
+    router.push(`/ai-tools/${featureSlug}`)
+  }
   const renderToolCard = (category: AIToolCategory) => {
-    const isHovered = hoveredCard === category.id;
+    const isHovered = hoveredCard === category.id
     return (
       <div
         key={category.id}
@@ -46,12 +46,12 @@ const AIToolsGrid: React.FC = () => {
           boxShadow: '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d',
         }}
         onMouseEnter={(e) => {
-          setHoveredCard(category.id);
-          e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 2px 2px 9px 0 #290058';
+          setHoveredCard(category.id)
+          e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 2px 2px 9px 0 #290058'
         }}
         onMouseLeave={(e) => {
-          setHoveredCard(null);
-          e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d';
+          setHoveredCard(null)
+          e.currentTarget.style.boxShadow = '0 0 2px 0 #24417a14, 0 2px 6px 0 #2900577d'
         }}
         onClick={() => handleCategoryClick(category.id)}
       >
@@ -67,12 +67,14 @@ const AIToolsGrid: React.FC = () => {
             priority={false}
           />
           {/* Purple gradient overlay on hover */}
-          <div className={`
+          <div
+            className={`
             absolute inset-0
             bg-gradient-to-t from-[#7D42FB]/10 via-transparent to-transparent
             opacity-0 group-hover:opacity-100
             transition-opacity duration-300
-          `} />
+          `}
+          />
         </div>
         {/* Content Section */}
         <div className="p-6">
@@ -94,9 +96,7 @@ const AIToolsGrid: React.FC = () => {
                 onClick={(e) => handleFeatureClick(category.id, feature, e)}
               >
                 <div className="w-1.5 h-1.5 rounded-full bg-gray-400 group-hover:bg-[#7D42FB] transition-colors duration-300 mr-3 flex-shrink-0" />
-                <span className="hover:underline truncate">
-                  {feature}
-                </span>
+                <span className="hover:underline truncate">{feature}</span>
               </div>
             ))}
             {category.features.length > 5 && (
@@ -107,17 +107,19 @@ const AIToolsGrid: React.FC = () => {
           </div>
         </div>
         {/* Inner hover overlay effect */}
-        <div className={`
+        <div
+          className={`
           absolute inset-0
           bg-gradient-to-t from-[#7D42FB]/5 to-transparent
           opacity-0 group-hover:opacity-100
           transition-opacity duration-300
           pointer-events-none
           rounded-2xl
-        `} />
+        `}
+        />
       </div>
-    );
-  };
+    )
+  }
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
@@ -125,13 +127,11 @@ const AIToolsGrid: React.FC = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-black mb-6">
-              Browse AI Tools by{' '}
-              <span className="text-[#7D42FB]">Category</span>
+              Browse AI Tools by <span className="text-[#7D42FB]">Category</span>
             </h1>
             <p className="text-[#272729] text-lg md:text-xl max-w-4xl mx-auto leading-relaxed">
-              Discover the best AI tools organized by category. Each section
-              shows the top tools to help you find exactly what you need for
-              your projects.
+              Discover the best AI tools organized by category. Each section shows the top tools to
+              help you find exactly what you need for your projects.
             </p>
           </div>
         </div>
@@ -146,17 +146,12 @@ const AIToolsGrid: React.FC = () => {
       {/* Grid Container - More compact with max-width container */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8">
-          {AI_TOOLS_CATEGORIES.map((category) => (
-            renderToolCard(category)
-          ))}
+          {AI_TOOLS_CATEGORIES.map((category) => renderToolCard(category))}
         </div>
       </section>
     </div>
-  );
-};
-export default AIToolsGrid;
-
-
+  )
+}
+export default AIToolsGrid
 
 // ----------------------------------------------------------------------- //
-

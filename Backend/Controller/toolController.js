@@ -360,25 +360,60 @@ export const suggestions = async (req, res) => {
 export const toolFeature = async (req, res) => {
   try {
     const name = req.query.q;
-    if (!name)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12; // Default to 12 tools per page
+    const skip = (page - 1) * limit;
+
+    if (!name) {
       return res.status(404).json({
         success: false,
-        message: `Cannot get feature or category name form URL(Params)`,
+        message: `Cannot get feature or category name from URL(Params)`,
       });
+    }
 
-    const matchTools = await Tool.find({ category: name });
-    if (!matchTools)
+    // Get total count of tools for pagination metadata
+    const totalTools = await Tool.countDocuments({ category: name });
+
+    if (totalTools === 0) {
       return res.status(404).json({
         success: false,
         message: `${name} related Tools not Found`,
       });
+    }
+
+    // Get paginated tools
+    const matchTools = await Tool.find({ category: name })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // Optional: Sort by newest first
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalTools / limit);
+    const hasNextPage = page < totalPages;
+    const hasPrevPage = page > 1;
+
     return res.status(200).json({
-      success: "true",
-      message: "All tools Found Successfully",
-      matchTools,
+      success: true,
+      message: "Tools found successfully",
+      data: {
+        tools: matchTools,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalTools: totalTools,
+          toolsPerPage: limit,
+          hasNextPage: hasNextPage,
+          hasPrevPage: hasPrevPage,
+          nextPage: hasNextPage ? page + 1 : null,
+          prevPage: hasPrevPage ? page - 1 : null,
+        }
+      }
     });
+
   } catch (error) {
+    console.error('Error in toolFeature:', error);
     return res.status(500).json({
+      success: false,
       message: "Internal Server Error",
       error: error.message,
     });

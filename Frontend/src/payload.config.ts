@@ -17,6 +17,7 @@ import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { Tools } from './collections/tool'
+import { CSVUploads } from './collections/csv-uploads'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -63,7 +64,7 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URI || '',
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Tools],
+  collections: [Pages, Posts, Media, Categories, Users, Tools, CSVUploads],
   cors: [getServerSideURL()].filter(Boolean),
   // globals: [Header, Footer],
   plugins: [

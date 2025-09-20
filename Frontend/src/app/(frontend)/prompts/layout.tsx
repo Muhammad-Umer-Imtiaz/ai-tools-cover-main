@@ -44,21 +44,21 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://yoursite.com/prompts',
+    url: 'https://aitoolscover.com/prompts',
     title: 'AI Image Prompts for ChatGPT, DALL-E, Midjourney & More',
     description:
       'Explore 100+ AI image prompts for ChatGPT, DALL-E, Midjourney, Gemini & Stable Diffusion. Create portraits, landscapes, fantasy, and abstract art.',
     siteName: 'AI Tools Directory',
     images: [
       {
-        url: 'https://yoursite.com/images/ai-prompts-og.jpg',
+        url: 'https://aitoolscover.com/images/ai-prompts-og.jpg',
         width: 1200,
         height: 630,
         alt: 'AI Image Prompts Collection - Professional prompts for ChatGPT DALL-E, Midjourney, Gemini, Leonardo AI',
         type: 'image/jpeg',
       },
       {
-        url: 'https://yoursite.com/images/ai-prompts-square.jpg',
+        url: 'https://aitoolscover.com/images/ai-prompts-square.jpg',
         width: 1080,
         height: 1080,
         alt: 'AI Image Prompts - Create stunning art with AI',
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
       'Explore 100+ AI image prompts for ChatGPT, DALL-E, Midjourney, Gemini & Stable Diffusion. Create portraits, landscapes, fantasy, and abstract art.',
     images: [
       {
-        url: 'https://yoursite.com/images/ai-prompts-twitter.jpg',
+        url: 'https://aitoolscover.com/images/ai-prompts-twitter.jpg',
         alt: 'AI Image Prompts Collection',
         width: 1200,
         height: 630,
@@ -83,10 +83,10 @@ export const metadata: Metadata = {
     ],
   },
   alternates: {
-    canonical: 'https://yoursite.com/prompts',
+    canonical: 'https://aitoolscover.com/prompts',
     languages: {
-      'en-US': 'https://yoursite.com/prompts',
-      en: 'https://yoursite.com/prompts',
+      'en-US': 'https://aitoolscover.com/prompts',
+      en: 'https://aitoolscover.com/prompts',
     },
   },
   category: 'Technology',
@@ -150,25 +150,25 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
-    '@id': 'https://yoursite.com/prompts#webpage',
+    '@id': 'https://aitoolscover.com/prompts#webpage',
     name: 'AI Image Prompts Collection',
     description:
       'Professional AI image prompts for ChatGPT DALL-E, Midjourney, Google Gemini, Leonardo AI, and Stable Diffusion',
-    url: 'https://yoursite.com/prompts',
+    url: 'https://aitoolscover.com/prompts',
     inLanguage: 'en-US',
     isPartOf: {
       '@type': 'WebSite',
-      '@id': 'https://yoursite.com/#website',
+      '@id': 'https://aitoolscover.com/#website',
       name: 'AI Tools Directory',
-      url: 'https://yoursite.com',
+      url: 'https://aitoolscover.com',
       publisher: {
         '@type': 'Organization',
-        '@id': 'https://yoursite.com/#organization',
+        '@id': 'https://aitoolscover.com/#organization',
         name: 'AI Tools Directory',
-        url: 'https://yoursite.com',
+        url: 'https://aitoolscover.com',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://yoursite.com/images/logo.png',
+          url: 'https://aitoolscover.com/images/logo.png',
           width: 300,
           height: 300,
         },
@@ -182,7 +182,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
       itemListElement: [
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#cinematic-portrait',
+          '@id': 'https://aitoolscover.com/prompts#cinematic-portrait',
           name: 'Cinematic Portrait Prompt',
           description:
             'Perfect for creating movie-like character portraits with professional lighting',
@@ -192,7 +192,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         },
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#ethereal-landscape',
+          '@id': 'https://aitoolscover.com/prompts#ethereal-landscape',
           name: 'Ethereal Landscape Prompt',
           description: 'Creates breathtaking fantasy landscapes with magical elements',
           category: 'Landscape',
@@ -201,7 +201,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         },
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#abstract-fluid-art',
+          '@id': 'https://aitoolscover.com/prompts#abstract-fluid-art',
           name: 'Abstract Fluid Art Prompt',
           description: 'Generate stunning abstract art with flowing, organic forms',
           category: 'Abstract',
@@ -210,7 +210,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         },
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#street-photography',
+          '@id': 'https://aitoolscover.com/prompts#street-photography',
           name: 'Street Photography Prompt',
           description: 'Capture authentic street moments with professional photography techniques',
           category: 'Photography',
@@ -219,7 +219,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         },
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#dragon-fantasy-art',
+          '@id': 'https://aitoolscover.com/prompts#dragon-fantasy-art',
           name: 'Dragon Fantasy Art Prompt',
           description: 'Epic fantasy scenes featuring mythical creatures and environments',
           category: 'Fantasy',
@@ -228,7 +228,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         },
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#modern-architecture',
+          '@id': 'https://aitoolscover.com/prompts#modern-architecture',
           name: 'Modern Architecture Prompt',
           description: 'Showcase contemporary architectural designs with professional precision',
           category: 'Architecture',
@@ -237,7 +237,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         },
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#anime-character-portrait',
+          '@id': 'https://aitoolscover.com/prompts#anime-character-portrait',
           name: 'Anime Character Portrait Prompt',
           description: 'Create beautiful anime-style character artwork',
           category: 'Portrait',
@@ -246,7 +246,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         },
         {
           '@type': 'CreativeWork',
-          '@id': 'https://yoursite.com/prompts#cyberpunk-cityscape',
+          '@id': 'https://aitoolscover.com/prompts#cyberpunk-cityscape',
           name: 'Cyberpunk Cityscape Prompt',
           description: 'Immersive cyberpunk environments with futuristic elements',
           category: 'Landscape',
@@ -262,19 +262,19 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
           '@type': 'ListItem',
           position: 1,
           name: 'Home',
-          item: 'https://yoursite.com',
+          item: 'https://aitoolscover.com',
         },
         {
           '@type': 'ListItem',
           position: 2,
           name: 'AI Prompts',
-          item: 'https://yoursite.com/prompts',
+          item: 'https://aitoolscover.com/prompts',
         },
       ],
     },
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://yoursite.com/prompts?search={search_term_string}',
+      target: 'https://aitoolscover.com/prompts?search={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   }
@@ -307,8 +307,8 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
         <link rel="robots" type="text/plain" href="/robots.txt" />
 
         {/* Hreflang for internationalization (add more as needed) */}
-        <link rel="alternate" hrefLang="en" href="https://yoursite.com/prompts" />
-        <link rel="alternate" hrefLang="x-default" href="https://yoursite.com/prompts" />
+        <link rel="alternate" hrefLang="en" href="https://aitoolscover.com/prompts" />
+        <link rel="alternate" hrefLang="x-default" href="https://aitoolscover.com/prompts" />
       </head>
 
       <body className="antialiased">
@@ -339,7 +339,7 @@ export default function PromptsLayout({ children }: PromptsLayoutProps) {
                   gtag('js', new Date());
                   gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
                     page_title: 'AI Image Prompts Collection',
-                    page_location: 'https://yoursite.com/prompts'
+                    page_location: 'https://aitoolscover.com/prompts'
                   });
                 `,
               }}

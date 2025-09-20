@@ -98,7 +98,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     alternates: {
-      canonical: `https://aitoolscover.com/ai-tools/${id}`,
+      canonical: `https://aitoolscover.com/tool/${id}`,
     },
   };
 }

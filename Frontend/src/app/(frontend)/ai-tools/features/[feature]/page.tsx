@@ -13,6 +13,8 @@ import {
   FiUsers,
   FiTarget,
   FiCheckCircle,
+  FiChevronLeft,
+  FiChevronRight,
 } from 'react-icons/fi'
 import { FaHeart } from 'react-icons/fa'
 import Image from 'next/image'
@@ -32,11 +34,12 @@ interface AITool {
   pricing: string
   tags: string
   description: string
-created_at: string;
+  created_at: string;
   is_approved: boolean;
-developer: string
+  developer: string
   submitted_by: string | null;
 }
+
 interface ProductTool {
   _id: number;
   name: string;
@@ -61,6 +64,17 @@ interface ProductTool {
   final_take?: string;
 }
 
+interface PaginationData {
+  currentPage: number;
+  totalPages: number;
+  totalTools: number;
+  toolsPerPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+  nextPage: number | null;
+  prevPage: number | null;
+}
+
 const FeaturePage = () => {
   const router = useRouter();
   const pathname = usePathname()
@@ -69,76 +83,97 @@ const FeaturePage = () => {
   const [tools, setTools] = useState<AITool[]>([])
   const [sortBy, setSortBy] = useState('popularity')
   const [filterBy, setFilterBy] = useState('all')
-    const [displayedProducts, setDisplayedProducts] = useState<ProductTool[]>([]);
-    const storeProductData = (product: ProductTool): void => {
-  if (typeof window !== 'undefined') {
-    try {
-      const productData = {
-        id: product._id.toString(),
-        name: product.name,
-        image: product.image_url,
-        thumbnail: product.thumbnail_url,
-        overview: product.overview || '',
-        logo: product.image_url,
-        description: product.description,
-        tag: product.category,
-        tagIcon: '',
-        link: product.link,
-        key_features: product.key_features || '',
-        what_you_can_do_with: product.what_you_can_do_with || '',
-        benefits: product.benefits || '',
-        pricing_plans: product.pricing_plans || '',
-        tips_best_practices: product.tips_best_practices || '',
-        final_take: product.final_take || '',
-      };
-      console.log(product._id);
-      sessionStorage.setItem(
-        `product_${product._id}`,
-        JSON.stringify(productData)
-      );
-    } catch (error) {
-      console.error('Error storing product data:', error);
-    }
-  }
-};
+  const [displayedProducts, setDisplayedProducts] = useState<ProductTool[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+  const [paginationLoading, setPaginationLoading] = useState(false);
   
+  const storeProductData = (product: ProductTool): void => {
+    if (typeof window !== 'undefined') {
+      try {
+        const productData = {
+          id: product._id.toString(),
+          name: product.name,
+          image: product.image_url,
+          thumbnail: product.thumbnail_url,
+          overview: product.overview || '',
+          logo: product.image_url,
+          description: product.description,
+          tag: product.category,
+          tagIcon: '',
+          link: product.link,
+          key_features: product.key_features || '',
+          what_you_can_do_with: product.what_you_can_do_with || '',
+          benefits: product.benefits || '',
+          pricing_plans: product.pricing_plans || '',
+          tips_best_practices: product.tips_best_practices || '',
+          final_take: product.final_take || '',
+        };
+        console.log(product._id);
+        sessionStorage.setItem(
+          `product_${product._id}`,
+          JSON.stringify(productData)
+        );
+      } catch (error) {
+        console.error('Error storing product data:', error);
+      }
+    }
+  };
 
-  const apiCall = async (slug: string) => {
-    setLoading(true)
+  const apiCall = async (slug: string, page: number = 1) => {
+    if (page === 1) {
+      setLoading(true)
+    } else {
+      setPaginationLoading(true)
+    }
+    
     try {
-      console.log('Trying to hit API')
+      console.log('Trying to hit API for page:', page)
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/toolfeature?q=${slug}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}api/tool/toolfeature?q=${slug}&page=${page}&limit=12`,
       )
 
       if (res.ok) {
         console.log('API hit successfully')
         const data = await res.json()
         console.log(data)
-       if (data?.matchTools) {
-  setTools(data.matchTools);
-  setDisplayedProducts(data.matchTools);
+        
+        if (data?.data?.tools) {
+          setTools(data.data.tools);
+          setDisplayedProducts(data.data.tools);
+          setPagination(data.data.pagination);
 
-  const existing = JSON.parse(sessionStorage.getItem("displayedProducts") || "[]");
-
-  const merged = [...existing, ...data.matchTools];
-
-  // optional: remove duplicates by `_id`
-  const unique = merged.filter(
-    (item, index, self) =>
-      index === self.findIndex((t) => t._id === item._id)
-  );
-
-  sessionStorage.setItem("displayedProducts", JSON.stringify(unique));
-}
-
-            } else {
+          // Store in sessionStorage (optional - you might want to modify this logic)
+          const existing = JSON.parse(sessionStorage.getItem("displayedProducts") || "[]");
+          const merged = [...existing, ...data.data.tools];
+          const unique = merged.filter(
+            (item, index, self) =>
+              index === self.findIndex((t) => t._id === item._id)
+          );
+          sessionStorage.setItem("displayedProducts", JSON.stringify(unique));
+        }
+      } else {
         console.error('Failed to fetch tools, status:', res.status)
+        toast.error('Failed to load tools')
       }
     } catch (error) {
       console.error('API call failed:', error)
+      toast.error('Failed to load tools')
     } finally {
       setLoading(false)
+      setPaginationLoading(false)
+    }
+  }
+
+  const handlePageChange = (page: number) => {
+    if (page === currentPage || paginationLoading) return;
+    
+    setCurrentPage(page);
+    const featureSlug = pathname ? pathname.split('/').pop() : ''
+    if (featureSlug) {
+      apiCall(featureSlug, page);
+      // Scroll to top of tools section
+      document.querySelector('#tools-section')?.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -151,17 +186,19 @@ const FeaturePage = () => {
 
     if (matchedFeature) {
       setFeatureData(matchedFeature)
+      setCurrentPage(1); // Reset to page 1
       if (featureSlug) {
-        apiCall(featureSlug)
+        apiCall(featureSlug, 1)
       }
     }
   }, [pathname])
+
   const createSlug = (name: string): string => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-};
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
 
   const getSortedAndFilteredTools = () => {
     if (!tools.length) return []
@@ -191,6 +228,80 @@ const FeaturePage = () => {
         return filteredTools
     }
   }
+
+  // Pagination component
+  const PaginationComponent = () => {
+    if (!pagination || pagination.totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      const pages = [];
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      return pages;
+    };
+
+    return (
+      <div className="flex items-center justify-center gap-2 mt-12">
+        {/* Previous Button */}
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={!pagination.hasPrevPage || paginationLoading}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg border transition-colors ${
+            pagination.hasPrevPage && !paginationLoading
+              ? 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          <FiChevronLeft size={16} />
+          Previous
+        </button>
+
+        {/* Page Numbers */}
+        <div className="flex items-center gap-1">
+          {getPageNumbers().map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              disabled={paginationLoading}
+              className={`w-10 h-10 rounded-lg border transition-colors ${
+                page === currentPage
+                  ? 'bg-[#7d42fb] text-white border-[#7d42fb]'
+                  : paginationLoading
+                  ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+
+        {/* Next Button */}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={!pagination.hasNextPage || paginationLoading}
+          className={`flex items-center gap-1 px-3 py-2 rounded-lg border transition-colors ${
+            pagination.hasNextPage && !paginationLoading
+              ? 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Next
+          <FiChevronRight size={16} />
+        </button>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -262,6 +373,193 @@ const FeaturePage = () => {
         <div className="absolute bottom-10 right-10 opacity-20">
           <Image src="/hero5.png" alt="decoration" width={100} height={60} />
         </div>
+      </section>
+
+      {/* Tools Grid Section */}
+      <section id="tools-section" className="max-w-7xl mx-auto px-6 py-16">
+        {/* Filters and Sort */}
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div >
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                All {featureData.title} Tools
+              </h2>
+              <p className="text-gray-600">
+                {pagination ? (
+                  <>
+                    Showing {((currentPage - 1) * 12) + 1}-{Math.min(currentPage * 12, pagination.totalTools)} of {pagination.totalTools} AI-powered {featureData.title.toLowerCase()} tools
+                  </>
+                ) : (
+                  `${sortedTools.length} AI-powered ${featureData.title.toLowerCase()} tools to choose from`
+                )}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {/* Filter Dropdown */}
+              <div className="relative text-black">
+                <select
+                  value={filterBy}
+                  onChange={(e) => setFilterBy(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-[#7d42fb] focus:border-transparent"
+                >
+                  <option value="all">All Tools</option>
+                  <option value="free">Free Only</option>
+                  <option value="paid">Paid Only</option>
+                </select>
+                <FiFilter
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  size={16}
+                />
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="relative text-black">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-[#7d42fb] focus:border-transparent"
+                >
+                  <option value="popularity">Most Popular</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="name">Alphabetical</option>
+                  <option value="newest">Newest</option>
+                </select>
+                <FiExternalLink
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+                  size={16}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Loading overlay for pagination */}
+        <div className="relative">
+          {paginationLoading && (
+            <div className="absolute inset-0 bg-white/70 z-10 flex items-center justify-center rounded-lg">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7d42fb] mx-auto mb-2"></div>
+                <p className="text-gray-600 text-sm">Loading more tools...</p>
+              </div>
+            </div>
+          )}
+
+          {/* Tools Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {sortedTools.map((tool) => (
+              <Link
+                key={tool._id}
+                href={`/tool/${createSlug(tool.name)}`}
+                onClick={() => storeProductData(tool)}
+              >
+                <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 group hover:-translate-y-1">
+                  {/* Tool Header */}
+                 {/* Tool Header */}
+<div className="flex items-start justify-between mb-4 gap-2">
+  <div className="flex items-center space-x-3 flex-1 min-w-0">
+    <div className="w-12 h-12 bg-[#7d42fb]/10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+      <img src={tool.image_url} alt={tool.name} className="w-8 h-8 object-contain" />
+    </div>
+    <div className="flex-1 min-w-0">
+      <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#7d42fb] transition-colors truncate" title={tool.name}>
+        {tool.name}
+      </h3>
+      <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <FiStar
+              key={i}
+              size={12}
+              className={
+                i < 4
+                  ? 'text-yellow-500 fill-current'
+                  : 'text-gray-300'
+              }
+            />
+          ))}
+          <span className="text-xs text-gray-500 ml-1">4/5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    className="p-2 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
+    aria-label="Add to favorites"
+  >
+    <FiHeart size={16} />
+  </button>
+</div>
+                  {/* Tool Description */}
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+                    {tool.overview}
+                  </p>
+
+                  {/* Tool Tags */}
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {tool.tags
+                      ?.split('#')
+                      .filter(Boolean)
+                      .slice(0, 3)
+                      .map((tag: string, index: number) => (
+                        <span
+                          key={index}
+                          className="px-2 py-1 bg-[#7d42fb]/10 text-[#7d42fb] text-xs rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="mb-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        tool.pricing === 'Free'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {tool.pricing}
+                    </span>
+                  </div>
+
+                  {/* Tool Actions */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <Link
+                      href={tool.link}
+                      className="flex items-center gap-2 text-[#7d42fb] font-medium hover:text-[#6b35e0] transition-colors"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Try Now <FiExternalLink size={14} />
+                    </Link>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Pagination Component */}
+        <PaginationComponent />
+
+        {/* No Results */}
+        {sortedTools.length === 0 && !loading && !paginationLoading && (
+          <div className="text-center py-12">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No tools found</h3>
+            <p className="text-gray-600 mb-4">Try adjusting your filters to see more results.</p>
+            <button
+              onClick={() => {
+                setFilterBy('all')
+                setSortBy('popularity')
+              }}
+              className="bg-[#7d42fb] text-white px-6 py-2 rounded-lg hover:bg-[#6b35e0] transition-colors"
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Feature Content Sections */}
@@ -338,180 +636,6 @@ const FeaturePage = () => {
         </section>
       )}
 
-      {/* Tools Grid Section */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        {/* Filters and Sort */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                All {featureData.title} Tools
-              </h2>
-              <p className="text-gray-600">
-                {sortedTools.length} AI-powered {featureData.title.toLowerCase()} tools to choose
-                from
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {/* Filter Dropdown */}
-              <div className="relative text-black">
-                <select
-                  value={filterBy}
-                  onChange={(e) => setFilterBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-[#7d42fb] focus:border-transparent"
-                >
-                  <option value="all">All Tools</option>
-                  <option value="free">Free Only</option>
-                  <option value="paid">Paid Only</option>
-                </select>
-                <FiFilter
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={16}
-                />
-              </div>
-
-              {/* Sort Dropdown */}
-              <div className="relative text-black">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-[#7d42fb] focus:border-transparent"
-                >
-                  <option value="popularity">Most Popular</option>
-                  <option value="rating">Highest Rated</option>
-                  <option value="name">Alphabetical</option>
-                  <option value="newest">Newest</option>
-                </select>
-                <FiExternalLink
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
-                  size={16}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {sortedTools.map((tool) => (
-            <Link
-                        key={tool._id}
-                        href={`/tool/${createSlug(tool.name)}`}
-                                    onClick={() => storeProductData(tool)}
-
-                        >
-            <div
-              key={tool._id}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 group hover:-translate-y-1"
-            >
-              {/* Tool Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-[#7d42fb]/10 rounded-xl flex items-center justify-center overflow-hidden">
-                    <img src={tool.image_url} alt={tool.name} className="w-8 h-8 object-contain" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#7d42fb] transition-colors truncate">
-                      {tool.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <FiStar
-                            key={i}
-                            size={12}
-                            className={
-                              i < 4
-                                ? // i < Math.floor(tool.rating)
-                                  'text-yellow-500 fill-current'
-                                : 'text-gray-300'
-                            }
-                          />
-                        ))}
-                        {/* <span className="text-xs text-gray-500 ml-1">{tool.rating}</span> */}
-                        <span className="text-xs text-gray-500 ml-1">4/5</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                  aria-label="Add to favorites"
-                >
-                  <FiHeart size={16} />
-                </button>
-              </div>
-
-              {/* Tool Description */}
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
-                {tool.overview}
-              </p>
-
-              {/* Tool Tags */}
-              <div className="flex flex-wrap gap-1 mb-4">
-                {tool.tags
-                  ?.split('#') // split by #
-                  .filter(Boolean) // remove empty strings
-                  .slice(0, 3) // take first 3
-                  .map((tag: string, index: number) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-[#7d42fb]/10 text-[#7d42fb] text-xs rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-              </div>
-
-              {/* Pricing */}
-              <div className="mb-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    tool.pricing === 'Free'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}
-                >
-                  {tool.pricing}
-                </span>
-              </div>
-
-              {/* Tool Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <Link
-                  href={tool.link}
-                  className="flex items-center gap-2 text-[#7d42fb] font-medium hover:text-[#6b35e0] transition-colors"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Try Now <FiExternalLink size={14} />
-                </Link>
-                {/* <div className="text-xs text-gray-500">#{tool.id}</div> */}
-              </div>
-            </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* No Results */}
-        {sortedTools.length === 0 && (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No tools found</h3>
-            <p className="text-gray-600 mb-4">Try adjusting your filters to see more results.</p>
-            <button
-              onClick={() => {
-                setFilterBy('all')
-                setSortBy('popularity')
-              }}
-              className="bg-[#7d42fb] text-white px-6 py-2 rounded-lg hover:bg-[#6b35e0] transition-colors"
-            >
-              Reset Filters
-            </button>
-          </div>
-        )}
-      </section>
-
       {/* Back to Categories Section */}
       <section className="bg-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -542,84 +666,3 @@ const FeaturePage = () => {
 }
 
 export default FeaturePage
-
-//  const generateDummyTools = (featureTitle: string): AITool[] => {
-//     const toolNames = [
-//       `${featureTitle} Tool 1`,
-//       `${featureTitle} Tool 2`,
-//       `${featureTitle} Tool 3`,
-//       `${featureTitle} Tool 4`,
-//       `${featureTitle} Tool 5`,
-//       `${featureTitle} Tool 6`,
-//       `${featureTitle} Tool 7`,
-//       `${featureTitle} Tool 8`,
-//       `${featureTitle} Tool 9`,
-//       `${featureTitle} Tool 10`,
-//       `${featureTitle} Tool 11`,
-//       `${featureTitle} Tool 12`,
-//     ]
-
-//     const descriptions = [
-//       `This is a ${featureTitle.toLowerCase()} tool that helps with your daily tasks.`,
-//       `Advanced ${featureTitle.toLowerCase()} tool for professional use.`,
-//       `Simple and effective ${featureTitle.toLowerCase()} tool for beginners.`,
-//       `Powerful ${featureTitle.toLowerCase()} tool with advanced features.`,
-//       `User-friendly ${featureTitle.toLowerCase()} tool for everyone.`,
-//       `Professional ${featureTitle.toLowerCase()} tool for businesses.`,
-//       `Free ${featureTitle.toLowerCase()} tool with basic features.`,
-//       `Premium ${featureTitle.toLowerCase()} tool with extra capabilities.`,
-//       `Easy-to-use ${featureTitle.toLowerCase()} tool for quick results.`,
-//       `Comprehensive ${featureTitle.toLowerCase()} tool for all needs.`,
-//       `Modern ${featureTitle.toLowerCase()} tool with sleek design.`,
-//       `Reliable ${featureTitle.toLowerCase()} tool trusted by users.`,
-//     ]
-
-//     const pricingOptions = [
-//       'Free',
-//       '$9.99/month',
-//       '$19.99/month',
-//       '$29.99/month',
-//       '$49.99/month',
-//       '$99.99/month',
-//     ]
-
-//     const tagOptions = [
-//       'AI-Powered',
-//       'Machine Learning',
-//       'Automation',
-//       'Analytics',
-//       'Integration',
-//       'Cloud-Based',
-//       'Real-time',
-//       'Collaboration',
-//       'Enterprise',
-//       'API',
-//       'Templates',
-//       'Customizable',
-//       'Multi-platform',
-//       'Secure',
-//       'Scalable',
-//       'User-friendly',
-//     ]
-
-//     return Array.from({ length: 12 }, (_, index) => {
-//       // Select 2-3 random tags
-//       const shuffledTags = [...tagOptions].sort(() => 0.5 - Math.random())
-//       const selectedTags = shuffledTags.slice(0, Math.floor(Math.random() * 2) + 2)
-
-//       return {
-//         id: 1000 + index,
-//         name: toolNames[index],
-//         description: descriptions[index],
-//         image_url: '/ai_logo.png',
-//         thumbnail_url: '/api/placeholder/300/200',
-//         category: featureTitle,
-//         click_count: Math.floor(Math.random() * 5000) + 100,
-//         link: `https://example-${index + 1}.com`,
-//         views: `${(Math.random() * 50 + 1).toFixed(1)}k`,
-//         rating: parseFloat((Math.random() * 1.5 + 3.5).toFixed(1)), // Rating between 3.5-5.0
-//         pricing: pricingOptions[Math.floor(Math.random() * pricingOptions.length)],
-//         tags: selectedTags,
-//       }
-//     })
-//   }
