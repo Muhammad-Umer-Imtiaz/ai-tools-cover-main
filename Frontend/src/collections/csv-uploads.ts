@@ -41,9 +41,10 @@ export const CSVUploads: CollectionConfig = {
   slug: 'csv-uploads',
   upload: {
     // Use /tmp directory for Vercel
-    staticDir: process.env.NODE_ENV === 'production' 
-      ? '/tmp/uploads' 
-      : path.resolve(__dirname, '../../public/uploads'),
+    staticDir:
+      process.env.NODE_ENV === 'production'
+        ? '/tmp/uploads'
+        : path.resolve(__dirname, '../../public/uploads'),
     mimeTypes: ['text/csv'],
   },
   access: {
@@ -58,7 +59,7 @@ export const CSVUploads: CollectionConfig = {
       async ({ doc, req }) => {
         try {
           console.log('📄 Processing file:', doc.filename, 'MIME:', doc.mimeType)
-          
+
           // ✅ Only process CSV files
           if (doc.mimeType !== 'text/csv') {
             console.log('⏭️ Skipping non-CSV file')
@@ -66,12 +67,13 @@ export const CSVUploads: CollectionConfig = {
           }
 
           // Determine file path based on environment
-          const uploadDir = process.env.NODE_ENV === 'production' 
-            ? '/tmp/uploads' 
-            : path.resolve(__dirname, '../../public/uploads')
-          
+          const uploadDir =
+            process.env.NODE_ENV === 'production'
+              ? '/tmp/uploads'
+              : path.resolve(__dirname, '../../public/uploads')
+
           const filePath = path.join(uploadDir, doc.filename)
-          
+
           console.log('📂 Reading file from:', filePath)
 
           // Check if file exists
@@ -106,14 +108,14 @@ export const CSVUploads: CollectionConfig = {
                 (err, records) => {
                   if (err) reject(err)
                   else resolve(records)
-                }
+                },
               )
             })
           }
 
           const records = await parseCSV(fileContent)
           console.log(`📂 Parsed ${records.length} records`)
-          
+
           if (records.length === 0) {
             console.warn('⚠️ No records found in CSV')
             return
@@ -134,8 +136,10 @@ export const CSVUploads: CollectionConfig = {
 
           for (const [index, record] of records.entries()) {
             try {
-              console.log(`🔄 Processing record ${index + 1}/${records.length}: ${record.tool_name}`)
-              
+              console.log(
+                `🔄 Processing record ${index + 1}/${records.length}: ${record.tool_name}`,
+              )
+
               const rawPricing = record['pricing_(raw)'] ?? record.pricing_raw ?? record.pricing
 
               const toolData: any = {
@@ -148,8 +152,7 @@ export const CSVUploads: CollectionConfig = {
                 what_you_can_do_with: record.what_you_can_do_with,
                 key_features: record.key_features || ' ',
                 benefits: record.benefits,
-                tips_best_practices:
-                  record['tips_&_best_practices'] ?? record.tips_best_practices,
+                tips_best_practices: record['tips_&_best_practices'] ?? record.tips_best_practices,
                 faqs: record.faqs,
                 pricing_plans: record.pricing_plans,
                 final_take: record.final_take,
@@ -185,19 +188,18 @@ export const CSVUploads: CollectionConfig = {
 
               successCount++
               console.log(`✅ Successfully inserted: ${toolData.name}`)
-
             } catch (insertError) {
               errorCount++
               console.error(
                 `❌ Failed to insert tool: ${record.tool_name} (${record.category})`,
-                insertError
+                insertError,
               )
-              
+
               // Log more details for debugging
               if (insertError instanceof Error) {
                 console.error('Error details:', {
                   message: insertError.message,
-                  stack: insertError.stack?.split('\n')[0]
+                  stack: insertError.stack?.split('\n')[0],
                 })
               }
             }
@@ -214,16 +216,15 @@ export const CSVUploads: CollectionConfig = {
               console.warn('⚠️ Could not clean up file:', cleanupError)
             }
           }
-
         } catch (outerErr) {
           console.error('❌ afterChange hook error:', outerErr)
-          
+
           // More detailed error logging
           if (outerErr instanceof Error) {
             console.error('Error details:', {
               message: outerErr.message,
               stack: outerErr.stack,
-              name: outerErr.name
+              name: outerErr.name,
             })
           }
         }
