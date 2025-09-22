@@ -371,8 +371,22 @@ export const toolFeature = async (req, res) => {
       });
     }
 
+    // Create normalized versions of the search term
+    const nameWithSpaces = name.replace(/-/g, " "); // Convert hyphens to spaces
+    const nameWithHyphens = name.replace(/\s+/g, "-"); // Convert spaces to hyphens
+
+    // Create search query for both category and tags
+    const searchQuery = {
+      $or: [
+        { category: name }, // Exact match for original category format
+        { category: nameWithHyphens }, // Match category with hyphens
+        { tags: { $regex: nameWithSpaces, $options: "i" } }, // Search in tags with spaces
+        { tags: { $regex: nameWithHyphens, $options: "i" } }, // Search in tags with hyphens (backup)
+      ],
+    };
+
     // Get total count of tools for pagination metadata
-    const totalTools = await Tool.countDocuments({ category: name });
+    const totalTools = await Tool.countDocuments(searchQuery);
 
     if (totalTools === 0) {
       return res.status(404).json({
@@ -382,7 +396,7 @@ export const toolFeature = async (req, res) => {
     }
 
     // Get paginated tools
-    const matchTools = await Tool.find({ category: name })
+    const matchTools = await Tool.find(searchQuery)
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 }); // Optional: Sort by newest first
@@ -441,10 +455,25 @@ export const aiToolsFeatures = async (req, res) => {
     const results = {};
 
     for (const category of features) {
-      const tools = await Tool.find({ category })
+      // Create normalized versions of the search term
+      const nameWithSpaces = category.replace(/-/g, " "); // Convert hyphens to spaces
+      const nameWithHyphens = category.replace(/\s+/g, "-"); // Convert spaces to hyphens
+
+      // Create search query for both category and tags
+      const searchQuery = {
+        $or: [
+          { category: category }, // Exact match for original category format
+          { category: nameWithHyphens }, // Match category with hyphens
+          { tags: { $regex: nameWithSpaces, $options: "i" } }, // Search in tags with spaces
+          { tags: { $regex: nameWithHyphens, $options: "i" } }, // Search in tags with hyphens (backup)
+        ],
+      };
+
+      const tools = await Tool.find(searchQuery)
         .sort({ createdAt: -1 })
         .limit(6)
         .lean();
+
       results[category] = tools;
     }
 
@@ -454,7 +483,6 @@ export const aiToolsFeatures = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 export const getAllToolsCategories = async (req, res) => {
   try {
     const { slug } = req.query; // e.g. "website-builders"
