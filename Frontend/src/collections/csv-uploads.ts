@@ -12,7 +12,7 @@ const normalizeFieldName = (fieldName: string): string => {
 const stripSpecialChars = (val: unknown): string | undefined => {
   if (val === null || val === undefined) return undefined
   return String(val)
-    .replace(/[^0-9a-zA-Z ]+/g, '')
+    .replace(/[^0-9a-zA-Z\-\s]+/g, '') // Keep hyphens by including \- in the allowed characters
     .replace(/\s+/g, ' ')
     .trim()
 }

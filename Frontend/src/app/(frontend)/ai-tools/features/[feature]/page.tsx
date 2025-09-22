@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
 import { AI_TOOLS_FEATURES, AIToolFeatures } from '@/constants'
 import Link from 'next/link'
@@ -34,65 +34,184 @@ interface AITool {
   pricing: string
   tags: string
   description: string
-  created_at: string;
-  is_approved: boolean;
+  created_at: string
+  is_approved: boolean
   developer: string
-  submitted_by: string | null;
+  submitted_by: string | null
 }
 
 interface ProductTool {
-  _id: number;
-  name: string;
-  link: string;
-  image_url: string;
-  thumbnail_url: string;
-  description: string;
-  overview: string;
-  tags: string;
-  created_at: string;
-  is_approved: boolean;
-  click_count: number;
-  views: number;
-  developer: string | null;
-  category: string;
-  submitted_by: string | null;
-  key_features?: string;
-  what_you_can_do_with?: string;
-  benefits?: string;
-  pricing_plans?: string;
-  tips_best_practices?: string;
-  final_take?: string;
+  _id: number
+  name: string
+  link: string
+  image_url: string
+  thumbnail_url: string
+  description: string
+  overview: string
+  tags: string
+  created_at: string
+  is_approved: boolean
+  click_count: number
+  views: number
+  developer: string | null
+  category: string
+  submitted_by: string | null
+  key_features?: string
+  what_you_can_do_with?: string
+  benefits?: string
+  pricing_plans?: string
+  tips_best_practices?: string
+  final_take?: string
 }
 
 interface PaginationData {
-  currentPage: number;
-  totalPages: number;
-  totalTools: number;
-  toolsPerPage: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-  nextPage: number | null;
-  prevPage: number | null;
+  currentPage: number
+  totalPages: number
+  totalTools: number
+  toolsPerPage: number
+  hasNextPage: boolean
+  hasPrevPage: boolean
+  nextPage: number | null
+  prevPage: number | null
+}
+
+// Favorites Hook
+const useFavorites = () => {
+  const [favorites, setFavorites] = useState<AITool[]>([])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedFavorites = localStorage.getItem('favoriteTools')
+      if (savedFavorites) {
+        try {
+          setFavorites(JSON.parse(savedFavorites))
+        } catch (error) {
+          console.error('Error parsing saved favorites:', error)
+          localStorage.removeItem('favoriteTools')
+        }
+      }
+    }
+  }, [])
+
+  const addToFavorites = (tool: any) => {
+    const updatedFavorites = [...favorites, tool]
+    setFavorites(updatedFavorites)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites))
+    }
+
+    toast.success(`${tool.name || 'Tool'} added to favorites!`, {
+      duration: 3000,
+      position: 'top-right',
+      style: {
+        background: '#7d42fb',
+        color: 'white',
+        fontWeight: 'bold',
+        borderRadius: '8px',
+        padding: '10px 15px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+      },
+    })
+  }
+
+  const removeFromFavorites = (toolId: number) => {
+    const toolToRemove = favorites.find((tool) => tool._id === toolId)
+
+    const updatedFavorites = favorites.filter((tool) => tool._id !== toolId)
+    setFavorites(updatedFavorites)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('favoriteTools', JSON.stringify(updatedFavorites))
+    }
+
+    toast.success(`${toolToRemove?.name || 'Tool'} removed from favorites!`, {
+      duration: 3000,
+      position: 'top-right',
+      style: {
+        background: '#7d42fb',
+        color: 'white',
+        fontWeight: 'bold',
+        borderRadius: '8px',
+        padding: '10px 15px',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+      },
+    })
+  }
+
+  const isFavorite = (toolId: number) => {
+    return favorites.some((tool) => tool._id === toolId)
+  }
+
+  const toggleFavorite = (tool: { _id: number }) => {
+    if (isFavorite(tool._id)) {
+      removeFromFavorites(tool._id)
+    } else {
+      addToFavorites(tool)
+    }
+  }
+
+  return {
+    favorites,
+    addToFavorites,
+    removeFromFavorites,
+    isFavorite,
+    toggleFavorite,
+  }
+}
+
+// Heart Button Component
+interface HeartButtonProps {
+  tool: any
+  isFavorite: boolean
+  onToggle: (tool: any) => void
+}
+
+const HeartButton: React.FC<HeartButtonProps> = ({ tool, isFavorite, onToggle }) => {
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  const handleClick = (e: { preventDefault: () => void; stopPropagation: () => void }) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    setIsAnimating(true)
+    onToggle(tool)
+
+    setTimeout(() => setIsAnimating(false), 300)
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`p-2 rounded-full transition-all duration-300 hover:scale-110 bg-white/80 backdrop-blur-sm shadow-sm hover:shadow-md ${
+        isAnimating ? 'animate-pulse' : ''
+      } ${isFavorite ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'}`}
+      aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+    >
+      {isFavorite ? <FaHeart size={18} className="drop-shadow-sm" /> : <FiHeart size={18} />}
+    </button>
+  )
 }
 
 const FeaturePage = () => {
-  const router = useRouter();
+  const router = useRouter()
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
   const [featureData, setFeatureData] = useState<AIToolFeatures | null>(null)
   const [tools, setTools] = useState<AITool[]>([])
   const [sortBy, setSortBy] = useState('popularity')
   const [filterBy, setFilterBy] = useState('all')
-  const [displayedProducts, setDisplayedProducts] = useState<ProductTool[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pagination, setPagination] = useState<PaginationData | null>(null);
-  const [paginationLoading, setPaginationLoading] = useState(false);
-  
+  const [displayedProducts, setDisplayedProducts] = useState<ProductTool[]>([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pagination, setPagination] = useState<PaginationData | null>(null)
+  const [paginationLoading, setPaginationLoading] = useState(false)
+
+  // Initialize favorites functionality
+  const { isFavorite, toggleFavorite } = useFavorites()
+
   const storeProductData = (product: ProductTool): void => {
     if (typeof window !== 'undefined') {
       try {
         const productData = {
-          id: product._id.toString(),
+          _id: product._id.toString(),
           name: product.name,
           image: product.image_url,
           thumbnail: product.thumbnail_url,
@@ -108,17 +227,14 @@ const FeaturePage = () => {
           pricing_plans: product.pricing_plans || '',
           tips_best_practices: product.tips_best_practices || '',
           final_take: product.final_take || '',
-        };
-        console.log(product._id);
-        sessionStorage.setItem(
-          `product_${product._id}`,
-          JSON.stringify(productData)
-        );
+        }
+        console.log(product._id)
+        sessionStorage.setItem(`product_${product._id}`, JSON.stringify(productData))
       } catch (error) {
-        console.error('Error storing product data:', error);
+        console.error('Error storing product data:', error)
       }
     }
-  };
+  }
 
   const apiCall = async (slug: string, page: number = 1) => {
     if (page === 1) {
@@ -126,7 +242,7 @@ const FeaturePage = () => {
     } else {
       setPaginationLoading(true)
     }
-    
+
     try {
       console.log('Trying to hit API for page:', page)
       const res = await fetch(
@@ -137,20 +253,19 @@ const FeaturePage = () => {
         console.log('API hit successfully')
         const data = await res.json()
         console.log(data)
-        
+
         if (data?.data?.tools) {
-          setTools(data.data.tools);
-          setDisplayedProducts(data.data.tools);
-          setPagination(data.data.pagination);
+          setTools(data.data.tools)
+          setDisplayedProducts(data.data.tools)
+          setPagination(data.data.pagination)
 
           // Store in sessionStorage (optional - you might want to modify this logic)
-          const existing = JSON.parse(sessionStorage.getItem("displayedProducts") || "[]");
-          const merged = [...existing, ...data.data.tools];
+          const existing = JSON.parse(sessionStorage.getItem('displayedProducts') || '[]')
+          const merged = [...existing, ...data.data.tools]
           const unique = merged.filter(
-            (item, index, self) =>
-              index === self.findIndex((t) => t._id === item._id)
-          );
-          sessionStorage.setItem("displayedProducts", JSON.stringify(unique));
+            (item, index, self) => index === self.findIndex((t) => t._id === item._id),
+          )
+          sessionStorage.setItem('displayedProducts', JSON.stringify(unique))
         }
       } else {
         console.error('Failed to fetch tools, status:', res.status)
@@ -166,14 +281,14 @@ const FeaturePage = () => {
   }
 
   const handlePageChange = (page: number) => {
-    if (page === currentPage || paginationLoading) return;
-    
-    setCurrentPage(page);
+    if (page === currentPage || paginationLoading) return
+
+    setCurrentPage(page)
     const featureSlug = pathname ? pathname.split('/').pop() : ''
     if (featureSlug) {
-      apiCall(featureSlug, page);
+      apiCall(featureSlug, page)
       // Scroll to top of tools section
-      document.querySelector('#tools-section')?.scrollIntoView({ behavior: 'smooth' });
+      document.querySelector('#tools-section')?.scrollIntoView({ behavior: 'smooth' })
     }
   }
 
@@ -186,7 +301,7 @@ const FeaturePage = () => {
 
     if (matchedFeature) {
       setFeatureData(matchedFeature)
-      setCurrentPage(1); // Reset to page 1
+      setCurrentPage(1) // Reset to page 1
       if (featureSlug) {
         apiCall(featureSlug, 1)
       }
@@ -197,8 +312,8 @@ const FeaturePage = () => {
     return name
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
+      .replace(/^-+|-+$/g, '')
+  }
 
   const getSortedAndFilteredTools = () => {
     if (!tools.length) return []
@@ -231,24 +346,24 @@ const FeaturePage = () => {
 
   // Pagination component
   const PaginationComponent = () => {
-    if (!pagination || pagination.totalPages <= 1) return null;
+    if (!pagination || pagination.totalPages <= 1) return null
 
     const getPageNumbers = () => {
-      const pages = [];
-      const maxVisiblePages = 5;
-      let startPage = Math.max(1, currentPage - 2);
-      let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1);
+      const pages = []
+      const maxVisiblePages = 5
+      let startPage = Math.max(1, currentPage - 2)
+      let endPage = Math.min(pagination.totalPages, startPage + maxVisiblePages - 1)
 
       if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        startPage = Math.max(1, endPage - maxVisiblePages + 1)
       }
 
       for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
+        pages.push(i)
       }
 
-      return pages;
-    };
+      return pages
+    }
 
     return (
       <div className="flex items-center justify-center gap-2 mt-12">
@@ -277,8 +392,8 @@ const FeaturePage = () => {
                 page === currentPage
                   ? 'bg-[#7d42fb] text-white border-[#7d42fb]'
                   : paginationLoading
-                  ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             >
               {page}
@@ -300,8 +415,8 @@ const FeaturePage = () => {
           <FiChevronRight size={16} />
         </button>
       </div>
-    );
-  };
+    )
+  }
 
   if (loading) {
     return (
@@ -380,14 +495,16 @@ const FeaturePage = () => {
         {/* Filters and Sort */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div >
+            <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
                 All {featureData.title} Tools
               </h2>
               <p className="text-gray-600">
                 {pagination ? (
                   <>
-                    Showing {((currentPage - 1) * 12) + 1}-{Math.min(currentPage * 12, pagination.totalTools)} of {pagination.totalTools} AI-powered {featureData.title.toLowerCase()} tools
+                    Showing {(currentPage - 1) * 12 + 1}-
+                    {Math.min(currentPage * 12, pagination.totalTools)} of {pagination.totalTools}{' '}
+                    AI-powered {featureData.title.toLowerCase()} tools
                   </>
                 ) : (
                   `${sortedTools.length} AI-powered ${featureData.title.toLowerCase()} tools to choose from`
@@ -453,43 +570,49 @@ const FeaturePage = () => {
                 href={`/tool/${createSlug(tool.name)}`}
                 onClick={() => storeProductData(tool)}
               >
-                <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 group hover:-translate-y-1">
+                <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100 group hover:-translate-y-1 relative">
+                  {/* Favorites Heart Button */}
+                  <div className="absolute top-3 right-3 z-10">
+                    <HeartButton
+                      tool={tool}
+                      isFavorite={isFavorite(tool._id)}
+                      onToggle={toggleFavorite}
+                    />
+                  </div>
+
                   {/* Tool Header */}
-                 {/* Tool Header */}
-<div className="flex items-start justify-between mb-4 gap-2">
-  <div className="flex items-center space-x-3 flex-1 min-w-0">
-    <div className="w-12 h-12 bg-[#7d42fb]/10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
-      <img src={tool.image_url} alt={tool.name} className="w-8 h-8 object-contain" />
-    </div>
-    <div className="flex-1 min-w-0">
-      <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#7d42fb] transition-colors truncate" title={tool.name}>
-        {tool.name}
-      </h3>
-      <div className="flex items-center gap-2 mt-1">
-        <div className="flex items-center">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <FiStar
-              key={i}
-              size={12}
-              className={
-                i < 4
-                  ? 'text-yellow-500 fill-current'
-                  : 'text-gray-300'
-              }
-            />
-          ))}
-          <span className="text-xs text-gray-500 ml-1">4/5</span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <button
-    className="p-2 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
-    aria-label="Add to favorites"
-  >
-    <FiHeart size={16} />
-  </button>
-</div>
+                  <div className="flex items-start justify-between mb-4 gap-2">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
+                      <div className="w-12 h-12 bg-[#7d42fb]/10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <img
+                          src={tool.image_url}
+                          alt={tool.name}
+                          className="w-8 h-8 object-contain"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3
+                          className="font-bold text-lg text-gray-900 group-hover:text-[#7d42fb] transition-colors truncate"
+                          title={tool.name}
+                        >
+                          {tool.name}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <FiStar
+                                key={i}
+                                size={12}
+                                className={i < 4 ? 'text-yellow-500 fill-current' : 'text-gray-300'}
+                              />
+                            ))}
+                            <span className="text-xs text-gray-500 ml-1">4/5</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Tool Description */}
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
                     {tool.overview}
