@@ -1,13 +1,12 @@
 const SITE_URL =
   process.env.NEXT_PUBLIC_SERVER_URL ||
-  process.env.VERCEL_PROJECT_PRODUCTION_URL ||
   'https://aitoolscover.com'
 
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
   siteUrl: SITE_URL,
   generateRobotsTxt: true,
-  exclude: ['/posts-sitemap.xml','/sitemap', '/pages-sitemap.xml', '/*', '/posts/*'],
+  exclude: [], // kuch bhi exclude nahi karna
   robotsTxtOptions: {
     policies: [
       {
@@ -15,6 +14,9 @@ module.exports = {
         disallow: '/admin/*',
       },
     ],
-    additionalSitemaps: [`${SITE_URL}/pages-sitemap.xml`, `${SITE_URL}/posts-sitemap.xml`],
+    additionalSitemaps: [`${SITE_URL}/sitemap`],
+    transformRobotsTxt: async (robotsTxt) => {
+      return `# *\n${robotsTxt}\n\n# Host\nHost: ${SITE_URL}`
+    },
   },
 }
