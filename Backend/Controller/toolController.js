@@ -363,7 +363,7 @@ export const toolFeature = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12; // Default to 12 tools per page
     const skip = (page - 1) * limit;
-
+    console.log(name);
     if (!name) {
       return res.status(404).json({
         success: false,
@@ -379,7 +379,8 @@ export const toolFeature = async (req, res) => {
     const searchQuery = {
       $or: [
         { category: name }, // Exact match for original category format
-        { category: nameWithHyphens }, // Match category with hyphens
+        { category: nameWithHyphens }, // Match category with hyphens,
+        { tags: name },
         { tags: { $regex: nameWithSpaces, $options: "i" } }, // Search in tags with spaces
         { tags: { $regex: nameWithHyphens, $options: "i" } }, // Search in tags with hyphens (backup)
       ],
@@ -456,24 +457,41 @@ export const aiToolsFeatures = async (req, res) => {
 
     for (const category of features) {
       // Create normalized versions of the search term
-      const nameWithSpaces = category.replace(/-/g, " "); // Convert hyphens to spaces
-      const nameWithHyphens = category.replace(/\s+/g, "-"); // Convert spaces to hyphens
-
-      // Create search query for both category and tags
-      const searchQuery = {
-        $or: [
-          { category: category }, // Exact match for original category format
-          { category: nameWithHyphens }, // Match category with hyphens
-          { tags: { $regex: nameWithSpaces, $options: "i" } }, // Search in tags with spaces
-          { tags: { $regex: nameWithHyphens, $options: "i" } }, // Search in tags with hyphens (backup)
-        ],
-      };
+      const nameWithSpaces = category.replace(/-/g, ' '); // Convert hyphens to spaces
+      const nameWithHyphens = category.replace(/\s+/g, '-'); // Convert spaces to hyphens
+      const nameWithSlashes = category.replace(/-/g, '/'); // Convert hyphens to slashes
+      
+      // Split the search term by hyphens to get individual parts
+      const nameParts = category.split('-').filter(part => part.length > 0);
+      
+      // Create search conditions
+      const searchConditions = [
+        { category: category }, // Exact match for original category format
+        { category: nameWithHyphens }, // Match category with hyphens
+        { tags: category }, // Exact match in tags
+        { tags: { $regex: nameWithSpaces, $options: "i" } }, // Search in tags with spaces
+        { tags: { $regex: nameWithHyphens, $options: "i" } }, // Search in tags with hyphens
+        { tags: { $regex: nameWithSlashes, $options: "i" } }, // Search in tags with slashes
+      ];
+      
+      // Add individual parts search (for cases like "low-code-no-code" finding "no-code")
+      nameParts.forEach(part => {
+        if (part.length > 2) { // Only add meaningful parts
+          searchConditions.push(
+            { category: part },
+            { category: { $regex: part, $options: "i" } },
+            { tags: { $regex: part, $options: "i" } }
+          );
+        }
+      });
+      
+      const searchQuery = { $or: searchConditions };
 
       const tools = await Tool.find(searchQuery)
         .sort({ createdAt: -1 })
         .limit(6)
         .lean();
-
+      
       results[category] = tools;
     }
 

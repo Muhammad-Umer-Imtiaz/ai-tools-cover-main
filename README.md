@@ -64,3 +64,14 @@ gift-ideas
 code-assistant  
 no-code  
 sql-assistant  
+
+
+
+
+Still Missing
+Avatar generator
+3D Avatar
+block chain
+NFT
+web 3
+Email Generators
