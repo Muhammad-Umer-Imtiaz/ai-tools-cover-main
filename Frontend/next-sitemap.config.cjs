@@ -6,7 +6,8 @@ const SITE_URL =
 module.exports = {
   siteUrl: SITE_URL,
   generateRobotsTxt: true,
-  exclude: [], // kuch bhi exclude nahi karna
+  // Ye option sitemap.xml ko generate karne se rok dega
+  generateIndexSitemap: false,
   robotsTxtOptions: {
     policies: [
       {
@@ -15,8 +16,5 @@ module.exports = {
       },
     ],
     additionalSitemaps: [`${SITE_URL}/sitemap`],
-    transformRobotsTxt: async (robotsTxt) => {
-      return `# *\n${robotsTxt}\n\n# Host\nHost: ${SITE_URL}`
-    },
   },
 }

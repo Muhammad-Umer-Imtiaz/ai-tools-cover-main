@@ -3,7 +3,8 @@ User-agent: *
 Disallow: /admin/*
 
 # Host
-Host: https://aitoolscover.com
+Host: http://localhost:3000
 
 # Sitemaps
-Sitemap: https://aitoolscover.com/sitemap
+Sitemap: http://localhost:3000/sitemap.xml
+Sitemap: http://localhost:3000/sitemap

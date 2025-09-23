@@ -63,7 +63,7 @@ export async function generateMetadata({
     },
     
     alternates: {
-      canonical: `https://aitoolscover.com/ai-tools/features/${feature}`,
+      canonical: `https://aitoolscover.com/ai-tools/${feature}`,
     },
     
     robots: {

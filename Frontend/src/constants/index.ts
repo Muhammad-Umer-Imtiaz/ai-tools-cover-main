@@ -39,7 +39,6 @@ export const categories = [
   // { label: 'Other', slug: 'other', emoji: '✨' },
 ]
 
-
 export interface AITool {
   id: number
   name: string
@@ -747,7 +746,7 @@ export const AI_TOOLS_FEATURES: AIToolFeatures[] = [
     color: 'text-blue-600',
     metaTitle: 'Best AI Website Builders available in 2025 – Build Stunning Sites with AI',
     metaDescription:
-      'Explore the top AI-powered website builders of 2025 to create professional websites without coding. Find AI Website builder platforms with auto-design, content generation, SEO guidance, and responsive layouts—all on AI Tools Cover.',
+      'Explore the best AI website builders of 2025 to create professional sites without coding. Get auto-design, content, SEO tools, and responsive layouts at AI Tools Cover.',
     focusKeywords: [
       'AI website builder',
       'AI site design tool',
@@ -5345,7 +5344,7 @@ export const AI_TOOLS_CATEGORIES: AIToolCategory[] = [
     ],
     metaTitle: 'Get More Done: Top AI Productivity Tools for 2025',
     metaDescription:
-      'Discover the best AI productivity tools of 2025 that streamline tasks, manage emails, handle research, translate text, and more. Explore tools for personal assistance, spreadsheets, presentations, and AI search—all in one place at AI Tools Cover.',
+      'Discover top AI productivity tools of 2025 to manage tasks, emails, research, translation, spreadsheets, presentations, and more—all in one place at AI Tools Cover.',
     focusKeywords: [
       'AI productivity tools',
       'task automation AI',
